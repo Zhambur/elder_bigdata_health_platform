@@ -11,7 +11,10 @@
       <!-- 左上：分布饼图 -->
       <div class="chart-container">
         <div class="chart-title">人群分布情况</div>
-        <div class="combined-chart">
+        <div
+          class="combined-chart"
+          v-if="!isLoadingDistribution && !errorStates.distribution"
+        >
           <VChart
             :option="genderDistributionOption"
             class="chart-half"
@@ -25,41 +28,120 @@
             :update-options="{ notMerge: true }"
           />
         </div>
+        <div v-else-if="isLoadingDistribution" class="chart-loading">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">正在加载人群分布数据...</div>
+        </div>
+        <div v-else-if="errorStates.distribution" class="chart-error">
+          <div class="error-icon">⚠️</div>
+          <div class="error-message">
+            {{ errorStates.distribution.message }}
+          </div>
+          <div class="error-time">{{ errorStates.distribution.timestamp }}</div>
+          <button
+            v-if="errorStates.distribution.canRetry"
+            @click="retryDataLoad('distribution')"
+            class="retry-button"
+          >
+            重试 ({{ 3 - retryCount.distribution }}/3)
+          </button>
+        </div>
       </div>
 
       <!-- 右上：已有风险观测柱状图 -->
       <div class="chart-container">
         <div class="chart-title">已有风险观测</div>
         <VChart
+          v-if="!isLoadingExistingRisk && !errorStates.existingRisk"
           :option="existingRiskBarOption"
           class="chart"
           :autoresize="true"
           :update-options="{ notMerge: true }"
           @click="handleRiskBarClick"
         />
+        <div v-else-if="isLoadingExistingRisk" class="chart-loading">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">正在加载风险观测数据...</div>
+        </div>
+        <div v-else-if="errorStates.existingRisk" class="chart-error">
+          <div class="error-icon">⚠️</div>
+          <div class="error-message">
+            {{ errorStates.existingRisk.message }}
+          </div>
+          <div class="error-time">{{ errorStates.existingRisk.timestamp }}</div>
+          <button
+            v-if="errorStates.existingRisk.canRetry"
+            @click="retryDataLoad('existingRisk')"
+            class="retry-button"
+          >
+            重试 ({{ 3 - retryCount.existingRisk }}/3)
+          </button>
+        </div>
       </div>
 
       <!-- 左下：指标情况箱线图 -->
       <div class="chart-container">
         <div class="chart-title">健康指标情况</div>
         <VChart
+          v-if="!isLoadingHealthIndicator && !errorStates.healthIndicator"
           :option="healthIndicatorOption"
           class="chart"
           :autoresize="true"
           :update-options="{ notMerge: true }"
         />
+        <div v-else-if="isLoadingHealthIndicator" class="chart-loading">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">正在加载健康指标数据...</div>
+        </div>
+        <div v-else-if="errorStates.healthIndicator" class="chart-error">
+          <div class="error-icon">⚠️</div>
+          <div class="error-message">
+            {{ errorStates.healthIndicator.message }}
+          </div>
+          <div class="error-time">
+            {{ errorStates.healthIndicator.timestamp }}
+          </div>
+          <button
+            v-if="errorStates.healthIndicator.canRetry"
+            @click="retryDataLoad('healthIndicator')"
+            class="retry-button"
+          >
+            重试 ({{ 3 - retryCount.healthIndicator }}/3)
+          </button>
+        </div>
       </div>
 
       <!-- 右下：慢病风险柱状图 -->
       <div class="chart-container">
         <div class="chart-title">慢病风险分析</div>
         <VChart
+          v-if="!isLoadingRiskPrediction && !errorStates.riskPrediction"
           :option="riskPredictionOption"
           class="chart"
           :autoresize="true"
           :update-options="{ notMerge: true }"
           @click="handleRiskPredictionClick"
         />
+        <div v-else-if="isLoadingRiskPrediction" class="chart-loading">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">正在加载风险预测数据...</div>
+        </div>
+        <div v-else-if="errorStates.riskPrediction" class="chart-error">
+          <div class="error-icon">⚠️</div>
+          <div class="error-message">
+            {{ errorStates.riskPrediction.message }}
+          </div>
+          <div class="error-time">
+            {{ errorStates.riskPrediction.timestamp }}
+          </div>
+          <button
+            v-if="errorStates.riskPrediction.canRetry"
+            @click="retryDataLoad('riskPrediction')"
+            class="retry-button"
+          >
+            重试 ({{ 3 - retryCount.riskPrediction }}/3)
+          </button>
+        </div>
       </div>
     </div>
     //dashboard-content ////////////////////////////////////////////
@@ -209,6 +291,191 @@ export default {
   setup() {
     const currentTime = ref("");
 
+    // 统一颜色主题配置
+    const colorTheme = {
+      // 主色调
+      primary: "#4ecdc4",
+      secondary: "#00d4ff",
+
+      // 健康状态颜色
+      healthy: "#4ecdc4", // 健康/正常 - 青色
+      warning: "#f9ca24", // 警告/中风险 - 黄色
+      danger: "#ff6b6b", // 危险/高风险 - 红色
+      info: "#45b7d1", // 信息/低风险 - 蓝色
+
+      // 性别颜色
+      female: "#ff6b6b", // 女性 - 暖红色
+      male: "#4ecdc4", // 男性 - 青色
+
+      // 年龄组颜色 (渐进色谱)
+      ageColors: [
+        "#45b7d1", // 60岁以下 - 浅蓝
+        "#4ecdc4", // 60-70岁 - 青色
+        "#f9ca24", // 70-80岁 - 黄色
+        "#ff9ff3", // 80-90岁 - 粉色
+        "#ff6b6b", // 90岁以上 - 红色
+      ],
+
+      // 风险类型颜色 (按风险程度排序)
+      riskColors: [
+        "#4ecdc4", // 低风险
+        "#45b7d1", // 较低风险
+        "#6c5ce7", // 中等风险
+        "#f9ca24", // 较高风险
+        "#ff9ff3", // 高风险
+        "#ff6b6b", // 极高风险
+        "#ff7e5f", // 严重风险
+        "#d63031", // 紧急
+        "#2d3436", // 其他
+        "#636e72", // 未分类
+        "#a29bfe", // 备用
+      ],
+
+      // 渐变配置
+      gradients: {
+        primary: {
+          type: "linear",
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: "#4ecdc4" },
+            { offset: 1, color: "#00d4ff" },
+          ],
+        },
+        warning: {
+          type: "linear",
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: "#ff7e5f" },
+            { offset: 1, color: "#feb47b" },
+          ],
+        },
+      },
+    };
+
+    // 统一动画配置
+    const animationConfig = {
+      // 基础动画配置
+      basic: {
+        animation: true,
+        animationDuration: 1000,
+        animationEasing: "cubicOut",
+        animationDelay: 0,
+      },
+
+      // 渐进式动画配置
+      progressive: {
+        animation: true,
+        animationDuration: 1200,
+        animationEasing: "elasticOut",
+        animationDelay: (idx) => idx * 100, // 每个数据项延迟100ms
+      },
+
+      // 更新动画配置
+      update: {
+        animation: true,
+        animationDuration: 800,
+        animationEasing: "quadraticInOut",
+        animationDurationUpdate: 600,
+        animationEasingUpdate: "cubicInOut",
+      },
+
+      // 交互动画配置
+      interaction: {
+        emphasis: {
+          scale: true,
+          scaleSize: 10,
+          itemStyle: {
+            shadowBlur: 20,
+            shadowColor: "rgba(78, 205, 196, 0.6)",
+          },
+        },
+        select: {
+          itemStyle: {
+            shadowBlur: 15,
+            shadowColor: "rgba(255, 107, 107, 0.8)",
+          },
+        },
+      },
+    };
+
+    // 加载状态管理
+    const isLoadingDistribution = ref(true);
+    const isLoadingExistingRisk = ref(true);
+    const isLoadingHealthIndicator = ref(true);
+    const isLoadingRiskPrediction = ref(true);
+
+    // 错误状态管理
+    const errorStates = ref({
+      distribution: null,
+      existingRisk: null,
+      healthIndicator: null,
+      riskPrediction: null,
+    });
+
+    // 重试计数器
+    const retryCount = ref({
+      distribution: 0,
+      existingRisk: 0,
+      healthIndicator: 0,
+      riskPrediction: 0,
+    });
+
+    const MAX_RETRY_COUNT = 3;
+
+    // 错误处理工具函数
+    const handleDataLoadError = (errorType, error, retryCallback) => {
+      console.error(`${errorType}数据加载失败:`, error);
+
+      const friendlyMessages = {
+        distribution: "人群分布数据加载失败，请检查网络连接",
+        existingRisk: "风险观测数据加载失败，请稍后重试",
+        healthIndicator: "健康指标数据加载失败，请检查数据源",
+        riskPrediction: "风险预测数据加载失败，请重新加载",
+      };
+
+      errorStates.value[errorType] = {
+        message: friendlyMessages[errorType] || "数据加载失败",
+        canRetry: retryCount.value[errorType] < MAX_RETRY_COUNT,
+        retryCallback,
+        timestamp: new Date().toLocaleString(),
+      };
+    };
+
+    // 重试函数
+    const retryDataLoad = (errorType) => {
+      if (retryCount.value[errorType] < MAX_RETRY_COUNT) {
+        retryCount.value[errorType]++;
+        errorStates.value[errorType] = null;
+
+        // 重新设置加载状态
+        switch (errorType) {
+          case "distribution":
+            isLoadingDistribution.value = true;
+            break;
+          case "existingRisk":
+            isLoadingExistingRisk.value = true;
+            break;
+          case "healthIndicator":
+            isLoadingHealthIndicator.value = true;
+            break;
+          case "riskPrediction":
+            isLoadingRiskPrediction.value = true;
+            break;
+        }
+
+        // 执行重试回调
+        if (errorStates.value[errorType]?.retryCallback) {
+          errorStates.value[errorType].retryCallback();
+        }
+      }
+    };
+
     // 动态计算字体大小的函数
     const getResponsiveFontSize = (baseSize = 16) => {
       const vw = Math.max(
@@ -249,9 +516,11 @@ export default {
           complete: (results) => {
             existingRiskData_0.value = results.data;
             updateHealthIndicatorChart();
+            isLoadingHealthIndicator.value = false;
           },
           error: (error) => {
             console.error("CSV解析错误:", error);
+            isLoadingHealthIndicator.value = false;
           },
           // 确保数值字段被正确解析为数字
           transform: (value, field) => {
@@ -263,6 +532,7 @@ export default {
         });
       } catch (error) {
         console.error("加载CSV文件失败:", error);
+        isLoadingHealthIndicator.value = false;
       }
     };
 
@@ -270,24 +540,30 @@ export default {
     // 加载已有风险数据
     const loadExistingRiskData = async () => {
       try {
-        const response = await fetch("/assets/data/现有_标签_2_风险观测.csv");
+        const response = await fetch(
+          "/assets/data/" + encodeURIComponent("现有_标签_2_风险观测.csv")
+        );
         const data = await response.text();
         Papa.parse(data, {
           complete: (result) => {
             existingRiskData.value = result.data;
             updateExistingRiskChart();
+            isLoadingExistingRisk.value = false;
           },
           header: true,
         });
       } catch (error) {
         console.error("加载已有风险数据失败:", error);
+        isLoadingExistingRisk.value = false;
       }
     };
 
     const PredictionData = ref([]);
     const loadPredictionData = async () => {
       try {
-        const response = await fetch("/assets/data/预测_标签.csv");
+        const response = await fetch(
+          "/assets/data/" + encodeURIComponent("预测_标签.csv")
+        );
         const csvText = await response.text();
 
         Papa.parse(csvText, {
@@ -314,17 +590,21 @@ export default {
     const riskPredictionData = ref([]);
     const loadRiskPredictionData = async () => {
       try {
-        const response = await fetch("/assets/data/预测_标签_2_风险预测.csv");
+        const response = await fetch(
+          "/assets/data/" + encodeURIComponent("预测_标签_2_风险预测.csv")
+        );
         const data = await response.text();
         Papa.parse(data, {
           complete: (result) => {
             riskPredictionData.value = result.data;
             updateRiskPredictionChart();
+            isLoadingRiskPrediction.value = false;
           },
           header: true,
         });
       } catch (error) {
         console.error("加载风险预测数据失败:", error);
+        isLoadingRiskPrediction.value = false;
       }
     };
 
@@ -359,32 +639,59 @@ export default {
 
     // 加载性别比例数据
     const loadGenderData = async () => {
-      const response = await fetch("/assets/data/性别比例.csv");
-      const data = await response.text();
-      Papa.parse(data, {
-        complete: (result) => {
-          genderData.value = result.data;
-          updateGenderDistribution();
-        },
-        header: true,
-      });
+      try {
+        const response = await fetch("/assets/data/性别比例.csv");
+        const data = await response.text();
+        Papa.parse(data, {
+          complete: (result) => {
+            genderData.value = result.data;
+            updateGenderDistribution();
+            checkDistributionLoadComplete();
+          },
+          header: true,
+        });
+      } catch (error) {
+        console.error("加载性别分布数据失败:", error);
+        handleDataLoadError("distribution", error, () => {
+          loadGenderData();
+          loadAgeData();
+        });
+      }
     };
 
     // 加载年龄比例数据
     const loadAgeData = async () => {
-      const response = await fetch("/assets/data/年龄比例.csv");
-      const data = await response.text();
-      Papa.parse(data, {
-        complete: (result) => {
-          ageData.value = result.data;
-          updateAgeDistribution();
-        },
-        header: true,
-      });
+      try {
+        const response = await fetch("/assets/data/年龄比例.csv");
+        const data = await response.text();
+        Papa.parse(data, {
+          complete: (result) => {
+            ageData.value = result.data;
+            updateAgeDistribution();
+            checkDistributionLoadComplete();
+          },
+          header: true,
+        });
+      } catch (error) {
+        console.error("加载年龄分布数据失败:", error);
+        handleDataLoadError("distribution", error, () => {
+          loadGenderData();
+          loadAgeData();
+        });
+      }
+    };
+
+    // 检查分布数据是否全部加载完成
+    const checkDistributionLoadComplete = () => {
+      if (genderData.value.length > 0 && ageData.value.length > 0) {
+        isLoadingDistribution.value = false;
+      }
     };
 
     // 更新性别分布数据
     const genderDistributionOption = ref({
+      ...animationConfig.basic,
+      animationDelay: (idx) => idx * 200, // 性别分布延迟动画
       title: {
         text: "性别分布",
         textStyle: {
@@ -395,6 +702,24 @@ export default {
       tooltip: {
         trigger: "item",
         formatter: "{a} <br/>{b}: {c} ({d}%)",
+        backgroundColor: "rgba(50, 50, 50, 0.9)",
+        borderColor: colorTheme.primary,
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
+        },
+      },
+      legend: {
+        orient: "horizontal",
+        bottom: "5%",
+        itemWidth: 14,
+        itemHeight: 14,
+        textStyle: {
+          color: "#fff",
+          fontSize: getResponsiveFontSize(14),
+        },
+        selectedMode: true, // 支持多选，同时显示男性和女性
+        icon: "circle",
       },
       series: [
         {
@@ -404,15 +729,22 @@ export default {
           center: ["50%", "45%"],
           data: [],
           emphasis: {
+            ...animationConfig.interaction.emphasis,
             itemStyle: {
-              shadowBlur: 10,
+              shadowBlur: 20,
               shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
+              shadowColor: "rgba(78, 205, 196, 0.8)",
             },
           },
+          select: animationConfig.interaction.select,
           label: {
             color: "#fff",
             fontSize: getResponsiveFontSize(30),
+          },
+          labelLine: {
+            lineStyle: {
+              color: "#fff",
+            },
           },
         },
       ],
@@ -420,6 +752,7 @@ export default {
 
     // 更新年龄分布数据
     const ageDistributionOption = ref({
+      ...animationConfig.progressive,
       title: {
         text: "年龄分布",
         textStyle: {
@@ -430,6 +763,24 @@ export default {
       tooltip: {
         trigger: "item",
         formatter: "{a} <br/>{b}: {c} ({d}%)",
+        backgroundColor: "rgba(50, 50, 50, 0.9)",
+        borderColor: colorTheme.secondary,
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
+        },
+      },
+      legend: {
+        orient: "horizontal",
+        bottom: "5%",
+        itemWidth: 14,
+        itemHeight: 14,
+        textStyle: {
+          color: "#fff",
+          fontSize: getResponsiveFontSize(14),
+        },
+        selectedMode: "multiple", // 支持多选切换
+        icon: "circle",
       },
       series: [
         {
@@ -439,15 +790,22 @@ export default {
           center: ["50%", "45%"],
           data: [],
           emphasis: {
+            ...animationConfig.interaction.emphasis,
             itemStyle: {
-              shadowBlur: 10,
+              shadowBlur: 20,
               shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
+              shadowColor: "rgba(0, 212, 255, 0.8)",
             },
           },
+          select: animationConfig.interaction.select,
           label: {
             color: "#fff",
             fontSize: getResponsiveFontSize(30),
+          },
+          labelLine: {
+            lineStyle: {
+              color: "#fff",
+            },
           },
         },
       ],
@@ -460,50 +818,38 @@ export default {
       const femaleCount =
         genderData.value.find((row) => row.性别 === "女性")?.人数 || 0;
       genderDistributionOption.value.series[0].data = [
-        { value: femaleCount, name: "女性", itemStyle: { color: "#ff6b6b" } },
-        { value: maleCount, name: "男性", itemStyle: { color: "#4ecdc4" } },
+        {
+          value: femaleCount,
+          name: "女性",
+          itemStyle: { color: colorTheme.female },
+        },
+        {
+          value: maleCount,
+          name: "男性",
+          itemStyle: { color: colorTheme.male },
+        },
       ];
     };
 
     // 根据CSV数据更新年龄分布
     const updateAgeDistribution = () => {
-      ageDistributionOption.value.series[0].data = [
-        {
-          value: parseInt(
-            ageData.value.find((row) => row.年龄分组 === "60岁以下")?.个数
-          ),
-          name: "60岁以下",
-          itemStyle: { color: "#45b7d1" },
-        },
-        {
-          value: parseInt(
-            ageData.value.find((row) => row.年龄分组 === "60-70岁")?.个数
-          ),
-          name: "60-70岁",
-          itemStyle: { color: "#f9ca24" },
-        },
-        {
-          value: parseInt(
-            ageData.value.find((row) => row.年龄分组 === "70-80岁")?.个数
-          ),
-          name: "70-80岁",
-          itemStyle: { color: "#6c5ce7" },
-        },
-        {
-          value: parseInt(
-            ageData.value.find((row) => row.年龄分组 === "80-90岁")?.个数
-          ),
-          name: "80-90岁",
-          itemStyle: { color: "#a29bfe" },
-        },
-        {
-          value: parseInt(
-            ageData.value.find((row) => row.年龄分组 === "90岁以上")?.个数
-          ),
-          name: "90岁以上",
-          itemStyle: { color: "#fd79a8" },
-        },
+      const ageGroups = [
+        "60岁以下",
+        "60-70岁",
+        "70-80岁",
+        "80-90岁",
+        "90岁以上",
       ];
+
+      ageDistributionOption.value.series[0].data = ageGroups.map(
+        (group, index) => ({
+          value: parseInt(
+            ageData.value.find((row) => row.年龄分组 === group)?.个数 || 0
+          ),
+          name: group,
+          itemStyle: { color: colorTheme.ageColors[index] },
+        })
+      );
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -748,8 +1094,7 @@ export default {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 风险预测图配置
     const riskPredictionOption = ref({
-      animation: true /* 启用动画 */,
-      animationDuration: 1000,
+      ...animationConfig.progressive,
       title: {
         text: "健康风险预测",
         textStyle: {
@@ -761,6 +1106,15 @@ export default {
         trigger: "axis",
         axisPointer: {
           type: "shadow",
+          shadowStyle: {
+            color: "rgba(78, 205, 196, 0.1)",
+          },
+        },
+        backgroundColor: "rgba(50, 50, 50, 0.95)",
+        borderColor: colorTheme.warning,
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
         },
       },
       grid: {
@@ -809,24 +1163,15 @@ export default {
           barWidth: "60%",
           data: [],
           itemStyle: {
-            color: {
-              type: "linear",
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: "#ff7e5f",
-                },
-                {
-                  offset: 1,
-                  color: "#feb47b",
-                },
-              ],
-            },
+            color: colorTheme.gradients.warning,
             borderRadius: [5, 5, 0, 0],
+          },
+          emphasis: {
+            itemStyle: {
+              color: colorTheme.gradients.primary,
+              shadowBlur: 15,
+              shadowColor: "rgba(78, 205, 196, 0.6)",
+            },
           },
           label: {
             show: true,
@@ -965,6 +1310,7 @@ export default {
 
       // 更新图表配置
       existingRiskBarOption.value = {
+        ...animationConfig.progressive,
         title: {
           text: "当前风险观测",
           textStyle: {
@@ -976,6 +1322,15 @@ export default {
           trigger: "axis",
           axisPointer: {
             type: "shadow",
+            shadowStyle: {
+              color: "rgba(78, 205, 196, 0.1)",
+            },
+          },
+          backgroundColor: "rgba(50, 50, 50, 0.95)",
+          borderColor: colorTheme.primary,
+          borderWidth: 1,
+          textStyle: {
+            color: "#fff",
           },
         },
         grid: {
@@ -1025,23 +1380,21 @@ export default {
             data: categories.map((cat) => counts[cat]),
             itemStyle: {
               color: function (params) {
-                // 使用不同颜色区分不同类型的风险
-                const colorList = [
-                  "#c23531",
-                  "#2f4554",
-                  "#61a0a8",
-                  "#d48265",
-                  "#91c7ae",
-                  "#749f83",
-                  "#ca8622",
-                  "#bda29a",
-                  "#6e7074",
-                  "#546570",
-                  "#c4ccd3",
-                ];
-                return colorList[params.dataIndex];
+                // 使用统一的风险颜色主题
+                return (
+                  colorTheme.riskColors[params.dataIndex] || colorTheme.primary
+                );
               },
               borderRadius: [5, 5, 0, 0], // 顶部圆角
+            },
+            emphasis: {
+              itemStyle: {
+                color: function (params) {
+                  return colorTheme.primary;
+                },
+                shadowBlur: 15,
+                shadowColor: "rgba(78, 205, 196, 0.6)",
+              },
             },
             label: {
               show: true,
@@ -1060,6 +1413,8 @@ export default {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const healthIndicatorOption = ref({
+      ...animationConfig.progressive,
+      animationDelay: (idx) => idx * 80, // 更密集的动画延迟
       title: {
         text: "生理指标分布箱线图",
         textStyle: {
@@ -1068,22 +1423,35 @@ export default {
         },
         left: "0%",
       },
-      animation: true /* 启用动画 */,
-      animationDuration: 1000 /* 动画持续时间 */,
       tooltip: {
         trigger: "item",
         axisPointer: {
           type: "shadow",
+          shadowStyle: {
+            color: "rgba(78, 205, 196, 0.1)",
+          },
+        },
+        backgroundColor: "rgba(50, 50, 50, 0.95)",
+        borderColor: colorTheme.primary,
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
         },
         formatter: function (params) {
           const data = params.data;
           return [
-            `指标: ${params.name}`,
-            `最大值: ${data[5].toFixed(2)}`,
+            `<strong style="color: ${colorTheme.primary};">指标: ${params.name}</strong>`,
+            `最大值: <span style="color: ${
+              colorTheme.danger
+            };">${data[5].toFixed(2)}</span>`,
             `上四分位数(Q3): ${data[4].toFixed(2)}`,
-            `中位数: ${data[3].toFixed(2)}`,
+            `中位数: <span style="color: ${
+              colorTheme.warning
+            };">${data[3].toFixed(2)}</span>`,
             `下四分位数(Q1): ${data[2].toFixed(2)}`,
-            `最小值: ${data[1].toFixed(2)}`,
+            `最小值: <span style="color: ${colorTheme.info};">${data[1].toFixed(
+              2
+            )}</span>`,
             `异常值数量: ${data[6]?.length || 0}`,
           ].join("<br/>");
         },
@@ -1129,13 +1497,13 @@ export default {
           type: "boxplot",
           data: [], // 动态填充
           itemStyle: {
-            color: "#4ecdc4",
+            color: colorTheme.primary,
             borderColor: "#fff",
             borderWidth: 1,
           },
           emphasis: {
             itemStyle: {
-              color: "#ff6b6b",
+              color: colorTheme.danger,
               borderColor: "#fff",
             },
           },
@@ -1366,6 +1734,15 @@ export default {
       pagedPredictionData,
       handlePredictionPageChange,
       pageSize,
+      // 加载状态
+      isLoadingDistribution,
+      isLoadingExistingRisk,
+      isLoadingHealthIndicator,
+      isLoadingRiskPrediction,
+      // 错误状态
+      errorStates,
+      retryCount,
+      retryDataLoad,
     };
   },
 };
@@ -1463,6 +1840,353 @@ export default {
 .chart-half {
   width: 50%;
   height: 100%;
+}
+
+/* 加载状态样式 */
+.chart-loading {
+  width: 100%;
+  height: clamp(350px, 45vh, 500px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  color: #4ecdc4;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(78, 205, 196, 0.2);
+  border-left: 4px solid #4ecdc4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: clamp(0.875rem, 1.2vw, 1rem);
+  font-weight: 500;
+  color: rgba(78, 205, 196, 0.9);
+  text-align: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 平板设备适配 */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    gap: clamp(15px, 2.5vw, 25px);
+    padding: clamp(15px, 2.5vw, 25px);
+  }
+
+  .chart-container {
+    min-height: clamp(350px, 45vh, 500px);
+  }
+
+  .chart {
+    height: clamp(300px, 40vh, 450px);
+  }
+
+  .combined-chart {
+    height: clamp(300px, 40vh, 450px);
+  }
+}
+
+/* 移动设备适配 */
+@media (max-width: 768px) {
+  .dashboard {
+    padding-bottom: 80px; /* 移动端增加底部空间 */
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+    padding: clamp(20px, 4vw, 25px);
+    min-height: auto;
+    gap: 10px;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+    margin-bottom: 10px;
+  }
+
+  .time {
+    margin-left: 0;
+    font-size: clamp(0.875rem, 3vw, 1rem);
+  }
+
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    gap: clamp(20px, 4vw, 30px);
+    padding: clamp(20px, 4vw, 30px);
+  }
+
+  .chart-container {
+    min-height: clamp(350px, 60vh, 500px);
+    padding: clamp(15px, 3vw, 20px);
+  }
+
+  .chart {
+    height: clamp(300px, 50vh, 400px);
+  }
+
+  .combined-chart {
+    flex-direction: column;
+    height: clamp(350px, 60vh, 500px);
+  }
+
+  .chart-half {
+    width: 100%;
+    height: 50%;
+    min-height: clamp(150px, 25vh, 200px);
+  }
+}
+
+/* 小屏幕手机适配 */
+@media (max-width: 480px) {
+  .dashboard {
+    padding-bottom: 100px;
+  }
+
+  .dashboard-header {
+    padding: 15px 20px;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(1.125rem, 6vw, 1.5rem);
+    line-height: 1.2;
+  }
+
+  .time {
+    font-size: clamp(0.75rem, 4vw, 0.875rem);
+  }
+
+  .dashboard-content {
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .chart-container {
+    min-height: clamp(300px, 70vh, 400px);
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .chart-title {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    margin-bottom: 10px;
+  }
+
+  .chart {
+    height: clamp(250px, 60vh, 350px);
+  }
+
+  .combined-chart {
+    height: clamp(280px, 65vh, 380px);
+  }
+
+  .chart-half {
+    min-height: clamp(120px, 30vh, 160px);
+  }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 360px) {
+  .dashboard-header {
+    padding: 10px 15px;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(1rem, 7vw, 1.25rem);
+  }
+
+  .dashboard-content {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .chart-container {
+    min-height: clamp(250px, 75vh, 350px);
+    padding: 10px;
+  }
+
+  .chart {
+    height: clamp(200px, 65vh, 300px);
+  }
+
+  .combined-chart {
+    height: clamp(230px, 70vh, 330px);
+  }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1920px) {
+  .dashboard-content {
+    gap: clamp(30px, 2.5vw, 40px);
+    padding: clamp(30px, 2.5vw, 40px);
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  .chart-container {
+    min-height: clamp(500px, 55vh, 700px);
+    padding: clamp(25px, 2vw, 35px);
+  }
+
+  .chart {
+    height: clamp(450px, 50vh, 650px);
+  }
+
+  .combined-chart {
+    height: clamp(450px, 50vh, 650px);
+  }
+}
+
+/* 确保分页组件样式 */
+.el-pagination {
+  margin-top: 20px;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.detail-pagination {
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.detail-pagination .el-pager li,
+.detail-pagination button {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 18px;
+}
+
+.detail-pagination .el-pager li.active {
+  background-color: #4ecdc4 !important;
+  color: #000 !important;
+}
+
+/* 确保对话框在移动端也能正常显示 */
+@media (max-width: 768px) {
+  .el-dialog {
+    width: 95% !important;
+    margin: 0 auto !important;
+  }
+
+  .el-dialog__body {
+    padding: 10px !important;
+  }
+
+  .el-table {
+    font-size: 12px !important;
+  }
+
+  .el-table th,
+  .el-table td {
+    padding: 8px 4px !important;
+  }
+}
+
+/* 错误状态样式 */
+.chart-error {
+  width: 100%;
+  height: clamp(350px, 45vh, 500px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: #ff6b6b;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-icon {
+  font-size: 48px;
+  animation: shake 2s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.error-message {
+  font-size: clamp(0.875rem, 1.2vw, 1.125rem);
+  font-weight: 600;
+  color: #ff6b6b;
+  margin-bottom: 5px;
+}
+
+.error-time {
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  color: rgba(255, 107, 107, 0.7);
+  margin-bottom: 15px;
+}
+
+.retry-button {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff9ff3 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.retry-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(135deg, #ff5252 0%, #ff8a80 100%);
+}
+
+.retry-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+}
+
+.retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* 平板设备适配 */
