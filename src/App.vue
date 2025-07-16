@@ -43,8 +43,10 @@ export default {
 
 <style>
 #app {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
 }
 </style>

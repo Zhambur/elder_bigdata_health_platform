@@ -1,44 +1,69 @@
-<template> 
+<template>
   <div class="dashboard">
-  <!-- 标题 -->
-  <div class="dashboard-header">
-    <h1>区域老年人健康大数据多维度分析平台</h1>
-    <div class="time">{{ currentTime }}</div>
-  </div>
-  
-  <!-- 内容 -->
-  <div class="dashboard-content">
-
-  <!-- 左上：分布饼图 -->
-  <div class="chart-container">
-    <div class="chart-title">人群分布情况</div>
-    <div class="combined-chart">
-      <VChart :option="genderDistributionOption" class="chart-half" />
-      <VChart :option="ageDistributionOption" class="chart-half" />
+    <!-- 标题 -->
+    <div class="dashboard-header">
+      <h1>区域老年人健康大数据多维度分析平台</h1>
+      <div class="time">{{ currentTime }}</div>
     </div>
-  </div>
 
-  <!-- 右上：已有风险观测柱状图 -->
-  <div class="chart-container">
-    <div class="chart-title">已有风险观测</div>
-    <VChart :option="existingRiskBarOption" class="chart" @click="handleRiskBarClick"/>
-  </div>
+    <!-- 内容 -->
+    <div class="dashboard-content">
+      <!-- 左上：分布饼图 -->
+      <div class="chart-container">
+        <div class="chart-title">人群分布情况</div>
+        <div class="combined-chart">
+          <VChart
+            :option="genderDistributionOption"
+            class="chart-half"
+            :autoresize="true"
+            :update-options="{ notMerge: true }"
+          />
+          <VChart
+            :option="ageDistributionOption"
+            class="chart-half"
+            :autoresize="true"
+            :update-options="{ notMerge: true }"
+          />
+        </div>
+      </div>
 
-  <!-- 左下：指标情况箱线图 -->
-  <div class="chart-container">
-    <div class="chart-title">健康指标情况</div>
-    <VChart :option="healthIndicatorOption" class="chart" />
-  </div>
+      <!-- 右上：已有风险观测柱状图 -->
+      <div class="chart-container">
+        <div class="chart-title">已有风险观测</div>
+        <VChart
+          :option="existingRiskBarOption"
+          class="chart"
+          :autoresize="true"
+          :update-options="{ notMerge: true }"
+          @click="handleRiskBarClick"
+        />
+      </div>
 
-  <!-- 右下：慢病风险柱状图 -->
-  <div class="chart-container">
-    <div class="chart-title">慢病风险分析</div>
-    <VChart :option="riskPredictionOption" class="chart" @click="handleRiskPredictionClick"/>
-  </div>
- </div>           //dashboard-content
+      <!-- 左下：指标情况箱线图 -->
+      <div class="chart-container">
+        <div class="chart-title">健康指标情况</div>
+        <VChart
+          :option="healthIndicatorOption"
+          class="chart"
+          :autoresize="true"
+          :update-options="{ notMerge: true }"
+        />
+      </div>
 
-////////////////////////////////////////////
-//第一个表格
+      <!-- 右下：慢病风险柱状图 -->
+      <div class="chart-container">
+        <div class="chart-title">慢病风险分析</div>
+        <VChart
+          :option="riskPredictionOption"
+          class="chart"
+          :autoresize="true"
+          :update-options="{ notMerge: true }"
+          @click="handleRiskPredictionClick"
+        />
+      </div>
+    </div>
+    //dashboard-content ////////////////////////////////////////////
+    //第一个表格
     <el-dialog
       v-model="riskDetailDialogVisible"
       :title="`${selectedRisk} 详细数据`"
@@ -78,8 +103,16 @@
         <el-table-column prop="体温" label="体温" width="100" />
         <el-table-column prop="血红蛋白" label="血红蛋白" width="100" />
         <el-table-column prop="甘油三酯" label="甘油三酯" width="100" />
-        <el-table-column prop="高密度脂蛋白胆固醇" label="高密度脂蛋白胆固醇" width="100" />
-        <el-table-column prop="低密度脂蛋白胆固醇" label="低密度脂蛋白胆固醇" width="100" />
+        <el-table-column
+          prop="高密度脂蛋白胆固醇"
+          label="高密度脂蛋白胆固醇"
+          width="100"
+        />
+        <el-table-column
+          prop="低密度脂蛋白胆固醇"
+          label="低密度脂蛋白胆固醇"
+          width="100"
+        />
         <el-table-column prop="尿pH" label="尿pH" width="100" />
         <el-table-column prop="尿比重" label="尿比重" width="100" />
         <el-table-column prop="呼吸频率" label="呼吸频率" width="100" />
@@ -92,17 +125,7 @@
       </template>
     </el-dialog>
 
-<el-pagination
-  v-if="1" 
-  @current-change="handlePageChange"
-  :current-page="currentPage"
-  :page-size="pageSize"
-  :total="100"
-  layout="prev, pager, next, jumper"
-/>
-
-///////////////////////////////////////////////////////
-//第二个表格
+    /////////////////////////////////////////////////////// //第二个表格
     <el-dialog
       v-model="predictionDetailDialogVisible"
       :title="`${selectedPredictionRisk} 详细数据`"
@@ -140,8 +163,16 @@
         <el-table-column prop="体温" label="体温" width="100" />
         <el-table-column prop="血红蛋白" label="血红蛋白" width="100" />
         <el-table-column prop="甘油三酯" label="甘油三酯" width="100" />
-        <el-table-column prop="高密度脂蛋白胆固醇" label="高密度脂蛋白" width="120" />
-        <el-table-column prop="低密度脂蛋白胆固醇" label="低密度脂蛋白" width="120" />
+        <el-table-column
+          prop="高密度脂蛋白胆固醇"
+          label="高密度脂蛋白"
+          width="120"
+        />
+        <el-table-column
+          prop="低密度脂蛋白胆固醇"
+          label="低密度脂蛋白"
+          width="120"
+        />
         <el-table-column prop="尿pH" label="尿pH" width="100" />
         <el-table-column prop="尿比重" label="尿比重" width="100" />
         <el-table-column prop="呼吸频率" label="呼吸频率" width="100" />
@@ -149,26 +180,27 @@
 
       <!-- 底部操作按钮 -->
       <template #footer>
-        <el-button @click="predictionDetailDialogVisible = false">关闭</el-button>
-        <el-button type="primary" @click="exportPredictionDetail">导出数据</el-button>
+        <el-button @click="predictionDetailDialogVisible = false"
+          >关闭</el-button
+        >
+        <el-button type="primary" @click="exportPredictionDetail"
+          >导出数据</el-button
+        >
       </template>
     </el-dialog>
-    
-    <el-pagination
-      @current-change="handlePredictionPageChange"
-      :current-page="currentPredictionPage"
-      :page-size="pageSize"
-      :total="100"
-      layout="prev, pager, next, jumper"
-    />
-
-
-  </div>            //dashboard
+  </div>
+  //dashboard
 </template>
 
 <script>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { ElDialog, ElTable, ElTableColumn ,ElMessage, ElPagination} from 'element-plus';
+import {
+  ElDialog,
+  ElTable,
+  ElTableColumn,
+  ElMessage,
+  ElPagination,
+} from "element-plus";
 import axios from "axios";
 import Papa from "papaparse";
 
@@ -176,7 +208,21 @@ export default {
   name: "Dashboard",
   setup() {
     const currentTime = ref("");
-        // 更新时间
+
+    // 动态计算字体大小的函数
+    const getResponsiveFontSize = (baseSize = 16) => {
+      const vw = Math.max(
+        document.documentElement.clientWidth || 0,
+        window.innerWidth || 0
+      );
+      if (vw <= 480) return Math.max(baseSize * 0.75, 12);
+      if (vw <= 768) return Math.max(baseSize * 0.85, 14);
+      if (vw <= 1200) return Math.max(baseSize * 0.95, 16);
+      if (vw <= 1440) return baseSize;
+      return Math.min(baseSize * 1.1, baseSize + 4);
+    };
+
+    // 更新时间
     const updateTime = () => {
       const now = new Date();
       currentTime.value = now.toLocaleString("zh-CN", {
@@ -188,92 +234,85 @@ export default {
         second: "2-digit",
       });
     };
-let timeInterval = null;
+    let timeInterval = null;
 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //加载CSV数据
+    ////////////////////////////////////////////////////////////////////////////////////////
+    const loadHealthData = async () => {
+      try {
+        const response = await fetch("/assets/data/health_data_utf8.csv");
+        const csvText = await response.text();
 
-///////////////////////////////////////////////////////////////////////////////////////
-//加载CSV数据
-////////////////////////////////////////////////////////////////////////////////////////
-const loadHealthData = async () => {
-  try {
-    const response = await fetch("/assets/data/health_data_utf8.csv"); 
-    const csvText = await response.text();
-    
-    Papa.parse(csvText, {
-      header: true,
-      complete: (results) => {
-        
-        existingRiskData_0.value = results.data;
-        updateHealthIndicatorChart();
-      },
-      error: (error) => {
-        console.error("CSV解析错误:", error);
-      },
-      // 确保数值字段被正确解析为数字
-      transform: (value, field) => {
-        if (INDICATORS.some(ind => ind.field === field)) {
-          return isNaN(parseFloat(value)) ? null : parseFloat(value);
-        }
-        return value;
+        Papa.parse(csvText, {
+          header: true,
+          complete: (results) => {
+            existingRiskData_0.value = results.data;
+            updateHealthIndicatorChart();
+          },
+          error: (error) => {
+            console.error("CSV解析错误:", error);
+          },
+          // 确保数值字段被正确解析为数字
+          transform: (value, field) => {
+            if (INDICATORS.some((ind) => ind.field === field)) {
+              return isNaN(parseFloat(value)) ? null : parseFloat(value);
+            }
+            return value;
+          },
+        });
+      } catch (error) {
+        console.error("加载CSV文件失败:", error);
       }
-    });
-  } catch (error) {
-    console.error("加载CSV文件失败:", error);
-  }
-};
+    };
 
-const existingRiskData = ref([]);
-// 加载已有风险数据
-const loadExistingRiskData = async () => {
-  try {
-    const response = await fetch("/assets/data/现有_标签_2_风险观测.csv"); 
-    const data = await response.text();
-    Papa.parse(data, {
-      complete: (result) => {
-        
-        existingRiskData.value = result.data;
-        updateExistingRiskChart();
-      },
-      header: true,
-    });
-  } catch (error) {
-    console.error("加载已有风险数据失败:", error);
-  }
-};
-
-
-
-
-const PredictionData = ref([]);
-const loadPredictionData = async () => {
-  try {
-    const response = await fetch("/assets/data/预测_标签.csv"); 
-    const csvText = await response.text();
-    
-    Papa.parse(csvText, {
-      header: true,
-      complete: (results) => {
-        
-        PredictionData.value = results.data;
-      },
-      error: (error) => {
-        console.error("CSV解析错误:", error);
-      },
-      transform: (value, field) => {
-        if (INDICATORS.some(ind => ind.field === field)) {
-          return isNaN(parseFloat(value)) ? null : parseFloat(value);
-        }
-        return value;
+    const existingRiskData = ref([]);
+    // 加载已有风险数据
+    const loadExistingRiskData = async () => {
+      try {
+        const response = await fetch("/assets/data/现有_标签_2_风险观测.csv");
+        const data = await response.text();
+        Papa.parse(data, {
+          complete: (result) => {
+            existingRiskData.value = result.data;
+            updateExistingRiskChart();
+          },
+          header: true,
+        });
+      } catch (error) {
+        console.error("加载已有风险数据失败:", error);
       }
-    });
-  } catch (error) {
-    console.error("加载CSV文件失败:", error);
-  }
-};
+    };
+
+    const PredictionData = ref([]);
+    const loadPredictionData = async () => {
+      try {
+        const response = await fetch("/assets/data/预测_标签.csv");
+        const csvText = await response.text();
+
+        Papa.parse(csvText, {
+          header: true,
+          complete: (results) => {
+            PredictionData.value = results.data;
+          },
+          error: (error) => {
+            console.error("CSV解析错误:", error);
+          },
+          transform: (value, field) => {
+            if (INDICATORS.some((ind) => ind.field === field)) {
+              return isNaN(parseFloat(value)) ? null : parseFloat(value);
+            }
+            return value;
+          },
+        });
+      } catch (error) {
+        console.error("加载CSV文件失败:", error);
+      }
+    };
 
     // 加载风险预测数据
-const riskPredictionData = ref([]);
-const loadRiskPredictionData = async () => {
+    const riskPredictionData = ref([]);
+    const loadRiskPredictionData = async () => {
       try {
         const response = await fetch("/assets/data/预测_标签_2_风险预测.csv");
         const data = await response.text();
@@ -289,17 +328,14 @@ const loadRiskPredictionData = async () => {
       }
     };
 
+    //////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
 
-
-//////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-    
     const riskDetailDialogVisible = ref(false);
     const selectedRisk = ref("");
-    const filteredHealthData = ref([]); 
+    const filteredHealthData = ref([]);
     const loadingRiskDetail = ref(false);
 
-    
     const currentPage = ref(1); // 当前页码
     const pageSize = ref(10); // 每页显示的数量
     const pagedHealthData = computed(() => {
@@ -309,20 +345,14 @@ const loadRiskPredictionData = async () => {
       return filteredHealthData.value.slice(start, end);
     });
 
-
     const handlePageChange = (newPage) => {
       console.log(newPage);
       currentPage.value = newPage;
-    };    
+    };
 
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////
-//左上：性别与年龄
-//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
+    //左上：性别与年龄
+    //////////////////////////////////////////////////////////////////////////////////////
     // 定义响应式变量来存储 CSV 数据
     const genderData = ref([]);
     const ageData = ref([]);
@@ -359,7 +389,7 @@ const loadRiskPredictionData = async () => {
         text: "性别分布",
         textStyle: {
           color: "#fff",
-          fontSize: 30,
+          fontSize: getResponsiveFontSize(30),
         },
       },
       tooltip: {
@@ -382,12 +412,11 @@ const loadRiskPredictionData = async () => {
           },
           label: {
             color: "#fff",
-            fontSize: 30,
+            fontSize: getResponsiveFontSize(30),
           },
         },
       ],
-      
-  });
+    });
 
     // 更新年龄分布数据
     const ageDistributionOption = ref({
@@ -395,7 +424,7 @@ const loadRiskPredictionData = async () => {
         text: "年龄分布",
         textStyle: {
           color: "#fff",
-          fontSize: 30,
+          fontSize: getResponsiveFontSize(30),
         },
       },
       tooltip: {
@@ -418,7 +447,7 @@ const loadRiskPredictionData = async () => {
           },
           label: {
             color: "#fff",
-            fontSize: 30,
+            fontSize: getResponsiveFontSize(30),
           },
         },
       ],
@@ -426,8 +455,10 @@ const loadRiskPredictionData = async () => {
 
     // 根据CSV数据更新性别分布
     const updateGenderDistribution = () => {
-      const maleCount = genderData.value.find(row => row.性别 === "男性")?.人数 || 0;
-      const femaleCount = genderData.value.find(row => row.性别 === "女性")?.人数 || 0;
+      const maleCount =
+        genderData.value.find((row) => row.性别 === "男性")?.人数 || 0;
+      const femaleCount =
+        genderData.value.find((row) => row.性别 === "女性")?.人数 || 0;
       genderDistributionOption.value.series[0].data = [
         { value: femaleCount, name: "女性", itemStyle: { color: "#ff6b6b" } },
         { value: maleCount, name: "男性", itemStyle: { color: "#4ecdc4" } },
@@ -436,48 +467,76 @@ const loadRiskPredictionData = async () => {
 
     // 根据CSV数据更新年龄分布
     const updateAgeDistribution = () => {
-      
       ageDistributionOption.value.series[0].data = [
-        { value: parseInt(ageData.value.find(row => row.年龄分组 === "60岁以下")?.个数), name: "60岁以下", itemStyle: { color: "#45b7d1" } },
-        { value: parseInt(ageData.value.find(row => row.年龄分组 === "60-70岁")?.个数), name: "60-70岁", itemStyle: { color: "#f9ca24" } },
-        { value: parseInt(ageData.value.find(row => row.年龄分组 === "70-80岁")?.个数), name: "70-80岁", itemStyle: { color: "#6c5ce7" } },
-        { value: parseInt(ageData.value.find(row => row.年龄分组 === "80-90岁")?.个数), name: "80-90岁", itemStyle: { color: "#a29bfe" } },
-        { value: parseInt(ageData.value.find(row => row.年龄分组 === "90岁以上")?.个数), name: "90岁以上", itemStyle: { color: "#fd79a8" } },
+        {
+          value: parseInt(
+            ageData.value.find((row) => row.年龄分组 === "60岁以下")?.个数
+          ),
+          name: "60岁以下",
+          itemStyle: { color: "#45b7d1" },
+        },
+        {
+          value: parseInt(
+            ageData.value.find((row) => row.年龄分组 === "60-70岁")?.个数
+          ),
+          name: "60-70岁",
+          itemStyle: { color: "#f9ca24" },
+        },
+        {
+          value: parseInt(
+            ageData.value.find((row) => row.年龄分组 === "70-80岁")?.个数
+          ),
+          name: "70-80岁",
+          itemStyle: { color: "#6c5ce7" },
+        },
+        {
+          value: parseInt(
+            ageData.value.find((row) => row.年龄分组 === "80-90岁")?.个数
+          ),
+          name: "80-90岁",
+          itemStyle: { color: "#a29bfe" },
+        },
+        {
+          value: parseInt(
+            ageData.value.find((row) => row.年龄分组 === "90岁以上")?.个数
+          ),
+          name: "90岁以上",
+          itemStyle: { color: "#fd79a8" },
+        },
       ];
     };
-    
-/////////////////////////////////////////////////////////////////////////////////////////
-//右上：互动
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const handleRiskBarClick = async (params) => {
-  if (params.componentType === "series" && params.seriesType === "bar") {
-    selectedRisk.value = params.name;
-    loadingRiskDetail.value = true;
-    riskDetailDialogVisible.value = true;
-    
-    currentPage.value = 1;
-    // 异步获取风险详情数据，避免阻塞UI
-    setTimeout(async () => {
-      await getFilteredHealthData(params.name);
-      loadingRiskDetail.value = false;
-    }, 0); // 0毫秒延迟，放入异步队列中处理
-  }
-};
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    //右上：互动
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    const handleRiskBarClick = async (params) => {
+      if (params.componentType === "series" && params.seriesType === "bar") {
+        selectedRisk.value = params.name;
+        loadingRiskDetail.value = true;
+        riskDetailDialogVisible.value = true;
+
+        currentPage.value = 1;
+        // 异步获取风险详情数据，避免阻塞UI
+        setTimeout(async () => {
+          await getFilteredHealthData(params.name);
+          loadingRiskDetail.value = false;
+        }, 0); // 0毫秒延迟，放入异步队列中处理
+      }
+    };
 
     // 获取符合风险条件的人员数据
     const getFilteredHealthData = async (riskType) => {
       try {
         // 根据风险类型获取符合条件的序号
         const selectedIndices = getAtRiskIndices(riskType);
-        
-        filteredHealthData.value = existingRiskData_0.value.filter(item =>
+
+        filteredHealthData.value = existingRiskData_0.value.filter((item) =>
           selectedIndices.includes(parseInt(item.序号))
         );
 
         if (filteredHealthData.value.length === 0) {
           //ElMessage.warning(`未找到 ${riskType} 的相关数据`);
         }
-        
       } catch (error) {
         console.error("获取风险详情数据失败:", error);
         ElMessage.error("获取风险详情数据失败");
@@ -487,25 +546,42 @@ const handleRiskBarClick = async (params) => {
     // 根据风险类型筛选出符合条件的序号
     const getAtRiskIndices = (riskType) => {
       const mapping = {
-  "体质异常": { field: "体质类别", condition: value => value !== "正常" },
-  "骨量异常": { field: "骨量", condition: value => value !== "正常" },
-  "高血压": { field: "高血压", condition: value => value === 1 }, // 高血压为1表示患病
-  "高血糖": { field: "高血糖", condition: value => value === 1 }, // 高血糖为1表示患病
-  "高血脂": { field: "高血脂", condition: value => value === '1' }, // 高血脂为1表示患病
-  "腰臀比异常": { field: "腰臀比异常", condition: value => value === '1' }, // 腰臀比异常为1表示患病
-  "睡眠不足": { field: "睡眠不足", condition: value => value === '1' }, // 睡眠不足为1表示患病
-  "动脉粥样硬化高风险": { field: "动脉粥样硬化高风险", condition: value => value === '1' }, // 动脉粥样硬化高风险为1表示患病
-  "肾功能异常": { field: "肾功能异常", condition: value => value === '1' }, // 肾功能异常为1表示患病
-  "体脂率偏高": { field: "体脂率偏高", condition: value => value === '1' }, // 体脂率偏高为1表示患病
-  "呼吸系统综合风险": { field: "呼吸系统综合风险", condition: value => value === '1' }, // 呼吸系统综合风险为1表示患病
-};
+        体质异常: { field: "体质类别", condition: (value) => value !== "正常" },
+        骨量异常: { field: "骨量", condition: (value) => value !== "正常" },
+        高血压: { field: "高血压", condition: (value) => value === 1 }, // 高血压为1表示患病
+        高血糖: { field: "高血糖", condition: (value) => value === 1 }, // 高血糖为1表示患病
+        高血脂: { field: "高血脂", condition: (value) => value === "1" }, // 高血脂为1表示患病
+        腰臀比异常: {
+          field: "腰臀比异常",
+          condition: (value) => value === "1",
+        }, // 腰臀比异常为1表示患病
+        睡眠不足: { field: "睡眠不足", condition: (value) => value === "1" }, // 睡眠不足为1表示患病
+        动脉粥样硬化高风险: {
+          field: "动脉粥样硬化高风险",
+          condition: (value) => value === "1",
+        }, // 动脉粥样硬化高风险为1表示患病
+        肾功能异常: {
+          field: "肾功能异常",
+          condition: (value) => value === "1",
+        }, // 肾功能异常为1表示患病
+        体脂率偏高: {
+          field: "体脂率偏高",
+          condition: (value) => value === "1",
+        }, // 体脂率偏高为1表示患病
+        呼吸系统综合风险: {
+          field: "呼吸系统综合风险",
+          condition: (value) => value === "1",
+        }, // 呼吸系统综合风险为1表示患病
+      };
 
       if (!mapping[riskType]) {
         return [];
       }
 
       const { field, condition } = mapping[riskType];
-      return existingRiskData.value.filter(row => condition(row[field])).map(row => parseInt(row.序号));
+      return existingRiskData.value
+        .filter((row) => condition(row[field]))
+        .map((row) => parseInt(row.序号));
     };
 
     // 导出风险详情数据
@@ -536,133 +612,149 @@ const handleRiskBarClick = async (params) => {
       }
     };
 
-
-
-////////////////////////////////////////////////////////////////////////////////////////////
-//右下：互动
-////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //右下：互动
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     const predictionDetailDialogVisible = ref(false);
     const selectedPredictionRisk = ref("");
     const filteredPredictionData = ref([]);
     const loadingPredictionDetail = ref(false);
     const currentPredictionPage = ref(1);
-    
+
     // 右下角柱状图点击事件
-const handleRiskPredictionClick = async (params) => {
-  if (params.componentType === "series" && params.seriesType === "bar") {
-    selectedPredictionRisk.value = params.name;
-    loadingPredictionDetail.value = true;
-    predictionDetailDialogVisible.value = true;
+    const handleRiskPredictionClick = async (params) => {
+      if (params.componentType === "series" && params.seriesType === "bar") {
+        selectedPredictionRisk.value = params.name;
+        loadingPredictionDetail.value = true;
+        predictionDetailDialogVisible.value = true;
 
-    // 将分页初始化为第一页
-    currentPredictionPage.value = 1;
+        // 将分页初始化为第一页
+        currentPredictionPage.value = 1;
 
-    // 异步获取风险详情数据，避免阻塞UI
-    setTimeout(async () => {
-      await getFilteredPredictionData(params.name);
-      loadingPredictionDetail.value = false;
-    }, 0); // 0毫秒延迟，放入异步队列中处理
-  }
-};
+        // 异步获取风险详情数据，避免阻塞UI
+        setTimeout(async () => {
+          await getFilteredPredictionData(params.name);
+          loadingPredictionDetail.value = false;
+        }, 0); // 0毫秒延迟，放入异步队列中处理
+      }
+    };
 
-// 获取符合预测风险条件的人员数据
-const getFilteredPredictionData = async (riskType) => {
-  try {
-    const selectedIndices = getPredictionRiskIndices(riskType);
-    console.log(selectedIndices);
-    filteredPredictionData.value = PredictionData.value.filter(item =>
-      selectedIndices.includes(parseInt(item.序号))
-    );
+    // 获取符合预测风险条件的人员数据
+    const getFilteredPredictionData = async (riskType) => {
+      try {
+        const selectedIndices = getPredictionRiskIndices(riskType);
+        console.log(selectedIndices);
+        filteredPredictionData.value = PredictionData.value.filter((item) =>
+          selectedIndices.includes(parseInt(item.序号))
+        );
 
-    if (filteredPredictionData.value.length === 0) {
-      ElMessage.warning(`未找到 ${riskType} 的相关数据`);
-    }
+        if (filteredPredictionData.value.length === 0) {
+          ElMessage.warning(`未找到 ${riskType} 的相关数据`);
+        }
+      } catch (error) {
+        console.error("获取预测风险详情数据失败:", error);
+        ElMessage.error("获取预测风险详情数据失败");
+      }
+    };
 
-  } catch (error) {
-    console.error("获取预测风险详情数据失败:", error);
-    ElMessage.error("获取预测风险详情数据失败");
-  }
-};
+    // 根据预测风险类型筛选出符合条件的序号
+    const getPredictionRiskIndices = (riskType) => {
+      const predictionRiskMapping = {
+        体质异常: { field: "体质类别", condition: (value) => value !== "正常" },
+        骨量异常: { field: "骨量", condition: (value) => value !== "正常" },
+        高血压: { field: "高血压", condition: (value) => value === "1" },
+        高血糖: { field: "高血糖", condition: (value) => value === "1" },
+        高血脂: { field: "高血脂", condition: (value) => value === "1" },
+        腰臀比异常: {
+          field: "腰臀比异常",
+          condition: (value) => value === "1",
+        },
+        睡眠不足: { field: "睡眠不足", condition: (value) => value === "1" },
+        动脉粥样硬化高风险: {
+          field: "动脉粥样硬化高风险",
+          condition: (value) => value === "1",
+        },
+        肾功能异常: {
+          field: "肾功能异常",
+          condition: (value) => value === "1",
+        },
+        体脂率偏高: {
+          field: "体脂率偏高",
+          condition: (value) => value === "1",
+        },
+        呼吸系统综合风险: {
+          field: "呼吸系统综合风险",
+          condition: (value) => value === "1",
+        },
+      };
 
-// 根据预测风险类型筛选出符合条件的序号
-const getPredictionRiskIndices = (riskType) => {
-  const predictionRiskMapping = {
-    "体质异常": { field: "体质类别", condition: value => value !== "正常" },
-    "骨量异常": { field: "骨量", condition: value => value !== "正常" },
-    "高血压": { field: "高血压", condition: value => value === '1' },
-    "高血糖": { field: "高血糖", condition: value => value === '1' },
-    "高血脂": { field: "高血脂", condition: value => value === '1' },
-    "腰臀比异常": { field: "腰臀比异常", condition: value => value === '1' },
-    "睡眠不足": { field: "睡眠不足", condition: value => value === '1' },
-    "动脉粥样硬化高风险": { field: "动脉粥样硬化高风险", condition: value => value === '1' },
-    "肾功能异常": { field: "肾功能异常", condition: value => value === '1' },
-    "体脂率偏高": { field: "体脂率偏高", condition: value => value === '1' },
-    "呼吸系统综合风险": { field: "呼吸系统综合风险", condition: value => value === '1' },
-  };
+      if (!predictionRiskMapping[riskType]) {
+        return [];
+      }
 
-  if (!predictionRiskMapping[riskType]) {
-    return [];
-  }
+      const { field, condition } = predictionRiskMapping[riskType];
+      console.log(riskPredictionData.value);
+      return riskPredictionData.value
+        .filter((row) => condition(row[field]))
+        .map((row) => parseInt(row.序号));
+    };
 
-  const { field, condition } = predictionRiskMapping[riskType];
-  console.log(riskPredictionData.value);
-  return riskPredictionData.value.filter(row => condition(row[field])).map(row => parseInt(row.序号));
-};
+    // 导出预测风险详情数据
+    const exportPredictionDetail = () => {
+      if (filteredPredictionData.value.length === 0) {
+        ElMessage.warning("没有数据可导出");
+        return;
+      }
 
-// 导出预测风险详情数据
-const exportPredictionDetail = () => {
-  if (filteredPredictionData.value.length === 0) {
-    ElMessage.warning("没有数据可导出");
-    return;
-  }
+      try {
+        const csv = Papa.unparse(filteredPredictionData.value);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
 
-  try {
-    const csv = Papa.unparse(filteredPredictionData.value);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute(
+          "download",
+          `${selectedPredictionRisk.value}_预测风险数据.csv`
+        );
+        link.style.visibility = "hidden";
 
-    link.setAttribute("href", url);
-    link.setAttribute("download", `${selectedPredictionRisk.value}_预测风险数据.csv`);
-    link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        ElMessage.success("导出成功");
+      } catch (error) {
+        console.error("导出失败:", error);
+        ElMessage.error("导出失败");
+      }
+    };
 
-    ElMessage.success("导出成功");
-  } catch (error) {
-    console.error("导出失败:", error);
-    ElMessage.error("导出失败");
-  }
-};
-    
     // 分页数据计算
     const pagedPredictionData = computed(() => {
-      console.log("filteredPredictionData:",filteredPredictionData.value);
+      console.log("filteredPredictionData:", filteredPredictionData.value);
       const start = (currentPredictionPage.value - 1) * pageSize.value;
       const end = currentPredictionPage.value * pageSize.value;
       return filteredPredictionData.value.slice(start, end);
     });
-    
+
     // 分页改变事件
     const handlePredictionPageChange = (newPage) => {
       currentPredictionPage.value = newPage;
     };
-    
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//右下：风险预测柱状图
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //右下：风险预测柱状图
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 风险预测图配置
     const riskPredictionOption = ref({
+      animation: true /* 启用动画 */,
+      animationDuration: 1000,
       title: {
         text: "健康风险预测",
         textStyle: {
           color: "#fff",
-          fontSize: 30,
+          fontSize: getResponsiveFontSize(30),
         },
       },
       tooltip: {
@@ -697,7 +789,7 @@ const exportPredictionDetail = () => {
         type: "value",
         axisLabel: {
           color: "#fff",
-          fontSize: 20,
+          fontSize: getResponsiveFontSize(20),
         },
         axisLine: {
           lineStyle: {
@@ -747,375 +839,504 @@ const exportPredictionDetail = () => {
       ],
     });
 
-
-    
-
     // 更新风险预测图表
     const updateRiskPredictionChart = () => {
-      if (!riskPredictionData.value || riskPredictionData.value.length === 0) return;
+      if (!riskPredictionData.value || riskPredictionData.value.length === 0)
+        return;
 
       // 定义风险类型
-        const riskTypes = [
-    "体质异常", "骨量异常", "高血压", "高血糖", "高血脂", 
-    "腰臀比异常", "睡眠不足", "动脉粥样硬化高风险",
-    "肾功能异常", "体脂率偏高", "呼吸系统综合风险"
-  ];
+      const riskTypes = [
+        "体质异常",
+        "骨量异常",
+        "高血压",
+        "高血糖",
+        "高血脂",
+        "腰臀比异常",
+        "睡眠不足",
+        "动脉粥样硬化高风险",
+        "肾功能异常",
+        "体脂率偏高",
+        "呼吸系统综合风险",
+      ];
 
-  // 计算各项风险人数
-  const riskCounts = {
-    '体质异常': riskPredictionData.value.filter(row => row['体质类别'] !== '正常').length,
-    '骨量异常': riskPredictionData.value.filter(row => row['骨量'] !== '正常').length,
-    '高血压': riskPredictionData.value.filter(row => row['高血压'] === '1').length,
-    '高血糖': riskPredictionData.value.filter(row => row['高血糖'] === '1').length,
-    '高血脂': riskPredictionData.value.filter(row => row['高血脂'] === '1').length,
-    '腰臀比异常': riskPredictionData.value.filter(row => row['腰臀比异常'] === '1').length,
-    '睡眠不足': riskPredictionData.value.filter(row => row['睡眠不足'] === '1').length,
-    '动脉粥样硬化高风险': riskPredictionData.value.filter(row => row['动脉粥样硬化高风险'] === '1').length,
-    '肾功能异常': riskPredictionData.value.filter(row => row['肾功能异常'] === '1').length,
-    '体脂率偏高': riskPredictionData.value.filter(row => row['体脂率偏高'] === '1').length,
-    '呼吸系统综合风险': riskPredictionData.value.filter(row => row['呼吸系统综合风险'] === '1').length
-  };
+      // 计算各项风险人数
+      const riskCounts = {
+        体质异常: riskPredictionData.value.filter(
+          (row) => row["体质类别"] !== "正常"
+        ).length,
+        骨量异常: riskPredictionData.value.filter(
+          (row) => row["骨量"] !== "正常"
+        ).length,
+        高血压: riskPredictionData.value.filter((row) => row["高血压"] === "1")
+          .length,
+        高血糖: riskPredictionData.value.filter((row) => row["高血糖"] === "1")
+          .length,
+        高血脂: riskPredictionData.value.filter((row) => row["高血脂"] === "1")
+          .length,
+        腰臀比异常: riskPredictionData.value.filter(
+          (row) => row["腰臀比异常"] === "1"
+        ).length,
+        睡眠不足: riskPredictionData.value.filter(
+          (row) => row["睡眠不足"] === "1"
+        ).length,
+        动脉粥样硬化高风险: riskPredictionData.value.filter(
+          (row) => row["动脉粥样硬化高风险"] === "1"
+        ).length,
+        肾功能异常: riskPredictionData.value.filter(
+          (row) => row["肾功能异常"] === "1"
+        ).length,
+        体脂率偏高: riskPredictionData.value.filter(
+          (row) => row["体脂率偏高"] === "1"
+        ).length,
+        呼吸系统综合风险: riskPredictionData.value.filter(
+          (row) => row["呼吸系统综合风险"] === "1"
+        ).length,
+      };
 
       // 更新图表配置
-        // 更新图表配置
-  riskPredictionOption.value.xAxis.data = riskTypes;
-  riskPredictionOption.value.series[0].data = riskTypes.map(risk => riskCounts[risk]);
-  
-  // 调整图表高度以适应更多项目
-  riskPredictionOption.value.grid.bottom = "15%";
+      // 更新图表配置
+      riskPredictionOption.value.xAxis.data = riskTypes;
+      riskPredictionOption.value.series[0].data = riskTypes.map(
+        (risk) => riskCounts[risk]
+      );
+
+      // 调整图表高度以适应更多项目
+      riskPredictionOption.value.grid.bottom = "15%";
     };
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//右上：已有风险数据
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 定义响应式变量存储已有风险数据
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //右上：已有风险数据
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 定义响应式变量存储已有风险数据
 
-const existingRiskBarOption = ref({});
+    const existingRiskBarOption = ref({});
 
-// 更新已有风险柱状图
-const updateExistingRiskChart = () => {
-  if (!existingRiskData.value || existingRiskData.value.length === 0) return;
+    // 更新已有风险柱状图
+    const updateExistingRiskChart = () => {
+      if (!existingRiskData.value || existingRiskData.value.length === 0)
+        return;
 
-  // 计算各项异常数量
-  const categories = [
-    '体质异常', '骨量异常', '高血压', '高血糖', '高血脂', 
-    '腰臀比异常', '睡眠不足', '动脉粥样硬化高风险', 
-    '肾功能异常', '体脂率偏高', '呼吸系统综合风险'
-  ];
+      // 计算各项异常数量
+      const categories = [
+        "体质异常",
+        "骨量异常",
+        "高血压",
+        "高血糖",
+        "高血脂",
+        "腰臀比异常",
+        "睡眠不足",
+        "动脉粥样硬化高风险",
+        "肾功能异常",
+        "体脂率偏高",
+        "呼吸系统综合风险",
+      ];
 
-  // 计算各项异常数量
-  const counts = {
-    '体质异常': existingRiskData.value.filter(row => row['体质类别'] !== '正常').length,
-    '骨量异常': existingRiskData.value.filter(row => row['骨量'] !== '正常').length,
-    '高血压': existingRiskData.value.filter(row => row['高血压'] === '1').length,
-    '高血糖': existingRiskData.value.filter(row => row['高血糖'] === '1').length,
-    '高血脂': existingRiskData.value.filter(row => row['高血脂'] === '1').length,
-    '腰臀比异常': existingRiskData.value.filter(row => row['腰臀比异常'] === '1').length,
-    '睡眠不足': existingRiskData.value.filter(row => row['睡眠不足'] === '1').length,
-    '动脉粥样硬化高风险': existingRiskData.value.filter(row => row['动脉粥样硬化高风险'] === '1').length,
-    '肾功能异常': existingRiskData.value.filter(row => row['肾功能异常'] === '1').length,
-    '体脂率偏高': existingRiskData.value.filter(row => row['体脂率偏高'] === '1').length,
-    '呼吸系统综合风险': existingRiskData.value.filter(row => row['呼吸系统综合风险'] === '1').length
-  };
-  
-  // 更新图表配置
-  existingRiskBarOption.value = {
-    title: {
-      text: "当前风险观测",
-      textStyle: {
-        color: "#fff",
-        fontSize: 30,
-      },
-    },
-    tooltip: {
-      trigger: "axis",
-      axisPointer: {
-        type: "shadow",
-      },
-    },
-    grid: {
-      top: "20%",
-      left: "3%",
-      right: "4%",
-      bottom: "10%", // 增加底部空间防止标签重叠
-      containLabel: true,
-    },
-    xAxis: {
-      type: "category",
-      data: categories,
-      axisLabel: {
-        color: "#fff",
-        fontSize: 20,
-        interval: 0, // 强制显示所有标签
-        rotate: 30, // 旋转30度防止重叠
-      },
-      axisLine: {
-        lineStyle: {
-          color: "#333",
-        },
-      },
-    },
-    yAxis: {
-      type: "value",
-      axisLabel: {
-        color: "#fff",
-        fontSize: 20,
-      },
-      axisLine: {
-        lineStyle: {
-          color: "#333",
-        },
-      },
-      splitLine: {
-        lineStyle: {
-          color: "#333",
-        },
-      },
-    },
-    series: [
-      {
-        name: "异常人数",
-        type: "bar",
-        barWidth: '60%',
-        data: categories.map(cat => counts[cat]),
-        itemStyle: {
-          color: function(params) {
-            // 使用不同颜色区分不同类型的风险
-            const colorList = [
-              '#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae',
-              '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'
-            ];
-            return colorList[params.dataIndex];
+      // 计算各项异常数量
+      const counts = {
+        体质异常: existingRiskData.value.filter(
+          (row) => row["体质类别"] !== "正常"
+        ).length,
+        骨量异常: existingRiskData.value.filter((row) => row["骨量"] !== "正常")
+          .length,
+        高血压: existingRiskData.value.filter((row) => row["高血压"] === "1")
+          .length,
+        高血糖: existingRiskData.value.filter((row) => row["高血糖"] === "1")
+          .length,
+        高血脂: existingRiskData.value.filter((row) => row["高血脂"] === "1")
+          .length,
+        腰臀比异常: existingRiskData.value.filter(
+          (row) => row["腰臀比异常"] === "1"
+        ).length,
+        睡眠不足: existingRiskData.value.filter(
+          (row) => row["睡眠不足"] === "1"
+        ).length,
+        动脉粥样硬化高风险: existingRiskData.value.filter(
+          (row) => row["动脉粥样硬化高风险"] === "1"
+        ).length,
+        肾功能异常: existingRiskData.value.filter(
+          (row) => row["肾功能异常"] === "1"
+        ).length,
+        体脂率偏高: existingRiskData.value.filter(
+          (row) => row["体脂率偏高"] === "1"
+        ).length,
+        呼吸系统综合风险: existingRiskData.value.filter(
+          (row) => row["呼吸系统综合风险"] === "1"
+        ).length,
+      };
+
+      // 更新图表配置
+      existingRiskBarOption.value = {
+        title: {
+          text: "当前风险观测",
+          textStyle: {
+            color: "#fff",
+            fontSize: getResponsiveFontSize(30),
           },
-          borderRadius: [5, 5, 0, 0] // 顶部圆角
         },
-        label: {
-          show: true,
-          position: 'top',
-          color: '#fff',
-          fontSize: 16,
-          formatter: '{c}'
-        }
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow",
+          },
+        },
+        grid: {
+          top: "20%",
+          left: "3%",
+          right: "4%",
+          bottom: "10%", // 增加底部空间防止标签重叠
+          containLabel: true,
+        },
+        xAxis: {
+          type: "category",
+          data: categories,
+          axisLabel: {
+            color: "#fff",
+            fontSize: getResponsiveFontSize(20),
+            interval: 0, // 强制显示所有标签
+            rotate: 30, // 旋转30度防止重叠
+          },
+          axisLine: {
+            lineStyle: {
+              color: "#333",
+            },
+          },
+        },
+        yAxis: {
+          type: "value",
+          axisLabel: {
+            color: "#fff",
+            fontSize: getResponsiveFontSize(20),
+          },
+          axisLine: {
+            lineStyle: {
+              color: "#333",
+            },
+          },
+          splitLine: {
+            lineStyle: {
+              color: "#333",
+            },
+          },
+        },
+        series: [
+          {
+            name: "异常人数",
+            type: "bar",
+            barWidth: "60%",
+            data: categories.map((cat) => counts[cat]),
+            itemStyle: {
+              color: function (params) {
+                // 使用不同颜色区分不同类型的风险
+                const colorList = [
+                  "#c23531",
+                  "#2f4554",
+                  "#61a0a8",
+                  "#d48265",
+                  "#91c7ae",
+                  "#749f83",
+                  "#ca8622",
+                  "#bda29a",
+                  "#6e7074",
+                  "#546570",
+                  "#c4ccd3",
+                ];
+                return colorList[params.dataIndex];
+              },
+              borderRadius: [5, 5, 0, 0], // 顶部圆角
+            },
+            label: {
+              show: true,
+              position: "top",
+              color: "#fff",
+              fontSize: 16,
+              formatter: "{c}",
+            },
+          },
+        ],
+      };
+    };
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 左下：箱线图配置
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const healthIndicatorOption = ref({
+      title: {
+        text: "生理指标分布箱线图",
+        textStyle: {
+          color: "#fff",
+          fontSize: getResponsiveFontSize(30),
+        },
+        left: "0%",
       },
-    ],
-  };
-};
+      animation: true /* 启用动画 */,
+      animationDuration: 1000 /* 动画持续时间 */,
+      tooltip: {
+        trigger: "item",
+        axisPointer: {
+          type: "shadow",
+        },
+        formatter: function (params) {
+          const data = params.data;
+          return [
+            `指标: ${params.name}`,
+            `最大值: ${data[5].toFixed(2)}`,
+            `上四分位数(Q3): ${data[4].toFixed(2)}`,
+            `中位数: ${data[3].toFixed(2)}`,
+            `下四分位数(Q1): ${data[2].toFixed(2)}`,
+            `最小值: ${data[1].toFixed(2)}`,
+            `异常值数量: ${data[6]?.length || 0}`,
+          ].join("<br/>");
+        },
+      },
+      grid: {
+        top: "15%",
+        left: "5%",
+        right: "5%",
+        bottom: "15%",
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: [], // 动态填充
+        axisLabel: {
+          color: "#fff",
+          fontSize: getResponsiveFontSize(20),
+          rotate: 45,
+          interval: 0,
+        },
+        axisLine: {
+          lineStyle: {
+            color: "#fff",
+          },
+        },
+      },
+      yAxis: {
+        type: "value",
 
+        axisLabel: {
+          color: "#fff",
+          fontSize: getResponsiveFontSize(20),
+        },
+        splitLine: {
+          lineStyle: {
+            color: "rgba(255, 255, 255, 0.1)",
+          },
+        },
+      },
+      series: [
+        {
+          name: "生理指标",
+          type: "boxplot",
+          data: [], // 动态填充
+          itemStyle: {
+            color: "#4ecdc4",
+            borderColor: "#fff",
+            borderWidth: 1,
+          },
+          emphasis: {
+            itemStyle: {
+              color: "#ff6b6b",
+              borderColor: "#fff",
+            },
+          },
+        },
+      ],
+      dataZoom: [
+        {
+          type: "slider",
+          xAxisIndex: 0,
+          filterMode: "filter",
+          height: 20,
+          bottom: 80,
+          start: 0,
+          end: 40,
+        },
+      ],
+    });
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 左下：箱线图配置
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 定义要展示的指标
+    const INDICATORS = [
+      { name: "体质指数", field: "体质指数" },
+      { name: "腰臀比", field: "腰臀比" },
+      { name: "收缩压", field: "收缩压" },
+      { name: "舒张压", field: "舒张压" },
+      { name: "血氧", field: "血氧" },
+      { name: "血糖", field: "血糖" },
+      { name: "脉率", field: "脉率" },
+      { name: "体脂", field: "体脂" },
+      { name: "总胆固醇", field: "总胆固醇" },
+      { name: "用力肺活量", field: "用力肺活量" },
+      { name: "尿酸", field: "尿酸" },
+      { name: "骨密度", field: "骨密度" },
+      { name: "睡眠时长", field: "睡眠时长" },
+      { name: "心率", field: "心率" },
+      { name: "水分含量", field: "水分含量" },
+      { name: "基础代谢率", field: "基础代谢率" },
+      { name: "体温", field: "体温" },
+      { name: "血红蛋白", field: "血红蛋白" },
+      { name: "甘油三酯", field: "甘油三酯" },
+      { name: "高密度脂蛋白", field: "高密度脂蛋白胆固醇" },
+      { name: "低密度脂蛋白", field: "低密度脂蛋白胆固醇" },
+      { name: "尿pH", field: "尿pH" },
+      { name: "尿比重", field: "尿比重" },
+      { name: "呼吸频率", field: "呼吸频率" },
+    ];
+    const existingRiskData_0 = ref([]);
+    // 加载CSV数据
 
-const healthIndicatorOption = ref({
-  title: {
-    text: "生理指标分布箱线图",
-    textStyle: {
-      color: "#fff",
-      fontSize: 30,
-    },
-    left: "0%",
-  },
-  tooltip: {
-    trigger: "item",
-    axisPointer: {
-      type: "shadow",
-    },
-    formatter: function(params) {
-      const data = params.data;
-      return [
-        `指标: ${params.name}`,
-        `最大值: ${data[5].toFixed(2)}`,
-        `上四分位数(Q3): ${data[4].toFixed(2)}`,
-        `中位数: ${data[3].toFixed(2)}`,
-        `下四分位数(Q1): ${data[2].toFixed(2)}`,
-        `最小值: ${data[1].toFixed(2)}`,
-        `异常值数量: ${data[6]?.length || 0}`
-      ].join('<br/>');
-    }
-  },
-  grid: {
-    top: "15%",
-    left: "5%",
-    right: "5%",
-    bottom: "15%",
-    containLabel: true
-  },
-  xAxis: {
-    type: "category",
-    data: [], // 动态填充
-    axisLabel: {
-      color: "#fff",
-      fontSize: 20,
-      rotate: 45,
-      interval: 0
-    },
-    axisLine: {
-      lineStyle: {
-        color: "#fff"
+    // 更新箱线图数据
+    const updateHealthIndicatorChart = () => {
+      if (!existingRiskData_0.value || existingRiskData_0.value.length === 0) {
+        console.error("无有效数据可用于绘制箱线图");
+        return;
+      }
+
+      // 设置x轴标签
+      healthIndicatorOption.value.xAxis.data = INDICATORS.map(
+        (ind) => ind.name
+      );
+
+      // 计算每个指标的箱线图数据
+      const boxplotData = INDICATORS.map((indicator) => {
+        // 提取该指标的所有有效值
+        const values = existingRiskData_0.value
+          .map((row) => parseFloat(row[indicator.field]))
+          .filter((v) => !isNaN(v))
+          .sort((a, b) => a - b);
+
+        if (values.length === 0) {
+          console.warn(`指标 ${indicator.name} 无有效数据`);
+          return [0, 0, 0, 0, 0, []];
+        }
+
+        // 计算统计量
+        const q1 = quantile(values, 0.25);
+        const median = quantile(values, 0.5);
+        const q3 = quantile(values, 0.75);
+        const iqr = q3 - q1;
+
+        // 计算异常值边界
+        const lowerBound = q1 - 1.5 * iqr;
+        const upperBound = q3 + 1.5 * iqr;
+
+        // 识别异常值
+        const outliers = values.filter((v) => v < lowerBound || v > upperBound);
+
+        // 计算正常范围的最小最大值
+        const normalValues = values.filter(
+          (v) => v >= lowerBound && v <= upperBound
+        );
+        const min = normalValues.length > 0 ? normalValues[0] : lowerBound;
+        const max =
+          normalValues.length > 0
+            ? normalValues[normalValues.length - 1]
+            : upperBound;
+
+        // 返回格式: [min, Q1, median, Q3, max, outliers]
+        return [min, q1, median, q3, max, outliers];
+      });
+
+      // 更新图表数据
+      healthIndicatorOption.value.series[0].data = boxplotData;
+
+      // 强制更新图表
+      healthIndicatorOption.value = { ...healthIndicatorOption.value };
+    };
+
+    // 分位数计算辅助函数
+    function quantile(sortedArray, p) {
+      const position = (sortedArray.length - 1) * p;
+      const base = Math.floor(position);
+      const rest = position - base;
+
+      if (sortedArray[base + 1] !== undefined) {
+        return (
+          sortedArray[base] + rest * (sortedArray[base + 1] - sortedArray[base])
+        );
+      } else {
+        return sortedArray[base];
       }
     }
-  },
-  yAxis: {
-    type: "value",
 
-    axisLabel: {
-      color: "#fff",
-      fontSize: 20
-    },
-    splitLine: {
-      lineStyle: {
-        color: "rgba(255, 255, 255, 0.1)"
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 防抖处理的resize事件
+    let resizeTimer = null;
+    const handleResize = () => {
+      // 清除之前的定时器
+      if (resizeTimer) {
+        clearTimeout(resizeTimer);
       }
-    }
-  },
-  series: [{
-    name: "生理指标",
-    type: "boxplot",
-    data: [], // 动态填充
-    itemStyle: {
-      color: "#4ecdc4",
-      borderColor: "#fff",
-      borderWidth: 1
-    },
-    emphasis: {
-      itemStyle: {
-        color: "#ff6b6b",
-        borderColor: "#fff"
+
+      // 延迟执行图表更新，避免频繁重绘
+      resizeTimer = setTimeout(() => {
+        // 更新所有图表的字体大小
+        updateChartFontSizes();
+
+        // 强制更新所有图表配置，触发图表重绘
+        genderDistributionOption.value = { ...genderDistributionOption.value };
+        ageDistributionOption.value = { ...ageDistributionOption.value };
+        existingRiskBarOption.value = { ...existingRiskBarOption.value };
+        riskPredictionOption.value = { ...riskPredictionOption.value };
+        healthIndicatorOption.value = { ...healthIndicatorOption.value };
+      }, 300); // 300ms防抖延迟
+    };
+
+    // 更新图表字体大小的函数
+    const updateChartFontSizes = () => {
+      const titleFontSize = getResponsiveFontSize(30);
+      const labelFontSize = getResponsiveFontSize(20);
+      const axisFontSize = getResponsiveFontSize(20);
+
+      // 更新性别分布图字体
+      if (genderDistributionOption.value.title) {
+        genderDistributionOption.value.title.textStyle.fontSize = titleFontSize;
       }
-    }
-  }],
-  dataZoom: [{
-    type: 'slider',
-    xAxisIndex: 0,
-    filterMode: 'filter',
-    height: 20,
-    bottom: 80,
-    start: 0,
-    end: 40
-  }]
-});
+      if (genderDistributionOption.value.series?.[0]?.label) {
+        genderDistributionOption.value.series[0].label.fontSize = labelFontSize;
+      }
 
-// 定义要展示的指标
-const INDICATORS = [
-  { name: "体质指数", field: "体质指数" },
-  { name: "腰臀比", field: "腰臀比" },
-  { name: "收缩压", field: "收缩压" },
-  { name: "舒张压", field: "舒张压" },
-  { name: "血氧", field: "血氧" },
-  { name: "血糖", field: "血糖" },
-  { name: "脉率", field: "脉率" },
-  { name: "体脂", field: "体脂" },
-  { name: "总胆固醇", field: "总胆固醇" },
-  { name: "用力肺活量", field: "用力肺活量" },
-  { name: "尿酸", field: "尿酸" },
-  { name: "骨密度", field: "骨密度" },
-  { name: "睡眠时长", field: "睡眠时长" },
-  { name: "心率", field: "心率" },
-  { name: "水分含量", field: "水分含量" },
-  { name: "基础代谢率", field: "基础代谢率" },
-  { name: "体温", field: "体温" },
-  { name: "血红蛋白", field: "血红蛋白" },
-  { name: "甘油三酯", field: "甘油三酯" },
-  { name: "高密度脂蛋白", field: "高密度脂蛋白胆固醇" },
-  { name: "低密度脂蛋白", field: "低密度脂蛋白胆固醇" },
-  { name: "尿pH", field: "尿pH" },
-  { name: "尿比重", field: "尿比重" },
-  { name: "呼吸频率", field: "呼吸频率" }
-];
-const existingRiskData_0 = ref([]);
-// 加载CSV数据
+      // 更新年龄分布图字体
+      if (ageDistributionOption.value.title) {
+        ageDistributionOption.value.title.textStyle.fontSize = titleFontSize;
+      }
+      if (ageDistributionOption.value.series?.[0]?.label) {
+        ageDistributionOption.value.series[0].label.fontSize = labelFontSize;
+      }
 
+      // 更新风险预测图字体
+      if (riskPredictionOption.value.title) {
+        riskPredictionOption.value.title.textStyle.fontSize = titleFontSize;
+      }
 
-
-
-
-
-// 更新箱线图数据
-const updateHealthIndicatorChart = () => {
-  if (!existingRiskData_0.value || existingRiskData_0.value.length === 0) {
-    console.error("无有效数据可用于绘制箱线图");
-    return;
-  }
-
-  // 设置x轴标签
-  healthIndicatorOption.value.xAxis.data = INDICATORS.map(ind => ind.name);
-
-  // 计算每个指标的箱线图数据
-  const boxplotData = INDICATORS.map(indicator => {
-    // 提取该指标的所有有效值
-    const values = existingRiskData_0.value
-      .map(row => parseFloat(row[indicator.field]))
-      .filter(v => !isNaN(v))
-      .sort((a, b) => a - b);
-
-    if (values.length === 0) {
-      console.warn(`指标 ${indicator.name} 无有效数据`);
-      return [0, 0, 0, 0, 0, []];
-    }
-
-    // 计算统计量
-    const q1 = quantile(values, 0.25);
-    const median = quantile(values, 0.5);
-    const q3 = quantile(values, 0.75);
-    const iqr = q3 - q1;
-    
-    // 计算异常值边界
-    const lowerBound = q1 - 1.5 * iqr;
-    const upperBound = q3 + 1.5 * iqr;
-    
-    // 识别异常值
-    const outliers = values.filter(v => v < lowerBound || v > upperBound);
-    
-    // 计算正常范围的最小最大值
-    const normalValues = values.filter(v => v >= lowerBound && v <= upperBound);
-    const min = normalValues.length > 0 ? normalValues[0] : lowerBound;
-    const max = normalValues.length > 0 ? normalValues[normalValues.length - 1] : upperBound;
-
-    // 返回格式: [min, Q1, median, Q3, max, outliers]
-    return [min, q1, median, q3, max, outliers];
-  });
-
-  // 更新图表数据
-  healthIndicatorOption.value.series[0].data = boxplotData;
-  
-  // 强制更新图表
-  healthIndicatorOption.value = {...healthIndicatorOption.value};
-  
-};
-
-// 分位数计算辅助函数
-function quantile(sortedArray, p) {
-  const position = (sortedArray.length - 1) * p;
-  const base = Math.floor(position);
-  const rest = position - base;
-  
-  if (sortedArray[base + 1] !== undefined) {
-    return sortedArray[base] + rest * (sortedArray[base + 1] - sortedArray[base]);
-  } else {
-    return sortedArray[base];
-  }
-}
-
-
-    
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // 更新健康指标图字体
+      if (healthIndicatorOption.value.title) {
+        healthIndicatorOption.value.title.textStyle.fontSize = titleFontSize;
+      }
+    };
 
     onMounted(() => {
-      loadGenderData(); 
-      loadAgeData();  
-      loadExistingRiskData(); 
+      loadGenderData();
+      loadAgeData();
+      loadExistingRiskData();
       loadHealthData();
       loadPredictionData();
-      loadRiskPredictionData(); 
+      loadRiskPredictionData();
       getFilteredHealthData();
       updateTime();
       timeInterval = setInterval(updateTime, 1000);
+
+      // 添加窗口尺寸变化监听器
+      window.addEventListener("resize", handleResize);
     });
 
     onUnmounted(() => {
       if (timeInterval) {
         clearInterval(timeInterval);
       }
+      // 移除事件监听器
+      window.removeEventListener("resize", handleResize);
     });
 
     return {
@@ -1135,8 +1356,8 @@ function quantile(sortedArray, p) {
       filteredHealthData,
       exportRiskDetail,
       exportPredictionDetail,
-      loadingRiskDetail ,
-            selectedPredictionRisk,
+      loadingRiskDetail,
+      selectedPredictionRisk,
       filteredPredictionData,
       loadingPredictionDetail,
       currentPredictionPage,
@@ -1144,7 +1365,7 @@ function quantile(sortedArray, p) {
       handleRiskPredictionClick,
       pagedPredictionData,
       handlePredictionPageChange,
-      pageSize
+      pageSize,
     };
   },
 };
@@ -1153,88 +1374,90 @@ function quantile(sortedArray, p) {
 <style>
 .dashboard {
   width: 100%;
-  height: 100vh;
-  background:url(/assets/bg.jpg) center center no-repeat; 
-  background-size:cover;
-  //color:#fff; 
-  font-size: .1rem;
-  overflow: hidden;
+  min-height: 100vh;
+  background: url(/assets/bg.jpg) center center no-repeat;
+  background-size: cover;
+  color: #fff;
+  font-size: 0.1rem;
+  position: relative;
+  padding-bottom: 50px; /* 底部留出空间，确保内容不被截断 */
 }
 
 .dashboard-header {
   display: flex;
-  //justify-content: center; 
   align-items: center;
-  padding: 20px 60px;
-  height: 100px;
+  justify-content: space-between;
+  padding: clamp(20px, 3vh, 30px) clamp(30px, 4vw, 50px);
+  min-height: clamp(80px, 10vh, 120px);
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dashboard-header h1 {
-  font-size: 60px;
+  font-size: clamp(1.5rem, 4vw, 3rem);
   font-weight: 600;
-  margin: 0 auto;
+  margin: 0;
   background: linear-gradient(45deg, #00d4ff, #4ecdc4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%); /* ✅ 精准居中 */
+  text-align: center;
+  flex: 1;
 }
 
-
 .time {
-  position: absolute;       /* ✅ 缺了这句！ */
-  right: 40px;              /* 靠右边 40px */
-  top: 50%;                 /* 垂直居中 */
-  transform: translateY(-50%);
-  font-size: 18px;
+  font-size: clamp(0.875rem, 1.2vw, 1.125rem);
   font-weight: 500;
   color: #4ecdc4;
+  white-space: nowrap;
+  margin-left: 20px;
 }
 
 .dashboard-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
-  height: calc(100vh - 120px);
-  background: transparent;
-  backdrop-filter: none;
+  gap: clamp(20px, 3vw, 30px);
+  padding: clamp(20px, 3vw, 30px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .chart-container {
-  height: 90%;
-  border-radius: 15px;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(10px, 1.5vw, 15px);
+  padding: clamp(20px, 2.5vw, 25px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  background: transparent;
-  backdrop-filter: none;
+  min-height: clamp(400px, 50vh, 600px);
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-title {
-  font-size: 40px;
+  font-size: clamp(1.125rem, 2.5vw, 1.75rem);
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: clamp(15px, 2vh, 20px);
   text-align: center;
   background: linear-gradient(45deg, #00d4ff, #4ecdc4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  flex-shrink: 0;
 }
 
 .chart {
   width: 100%;
-  height: calc(100% - 50px);
+  height: clamp(350px, 45vh, 500px);
+  flex: 1;
 }
 
 .combined-chart {
   display: flex;
-  height: calc(100% - 10px);
+  width: 100%;
+  height: clamp(350px, 45vh, 500px);
+  flex: 1;
 }
 
 .chart-half {
@@ -1242,38 +1465,182 @@ function quantile(sortedArray, p) {
   height: 100%;
 }
 
-
-
-/* 响应式设计 */
-@media (max-width: 1200px) {
-  .dashboard-header h1 {
-    font-size: 24px;
+/* 平板设备适配 */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    gap: clamp(15px, 2.5vw, 25px);
+    padding: clamp(15px, 2.5vw, 25px);
   }
 
-  .chart-title {
-    font-size: 18px;
+  .chart-container {
+    min-height: clamp(350px, 45vh, 500px);
+  }
+
+  .chart {
+    height: clamp(300px, 40vh, 450px);
+  }
+
+  .combined-chart {
+    height: clamp(300px, 40vh, 450px);
   }
 }
 
+/* 移动设备适配 */
 @media (max-width: 768px) {
+  .dashboard {
+    padding-bottom: 80px; /* 移动端增加底部空间 */
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+    padding: clamp(20px, 4vw, 25px);
+    min-height: auto;
+    gap: 10px;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+    margin-bottom: 10px;
+  }
+
+  .time {
+    margin-left: 0;
+    font-size: clamp(0.875rem, 3vw, 1rem);
+  }
+
   .dashboard-content {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
+    gap: clamp(20px, 4vw, 30px);
+    padding: clamp(20px, 4vw, 30px);
+  }
+
+  .chart-container {
+    min-height: clamp(350px, 60vh, 500px);
+    padding: clamp(15px, 3vw, 20px);
+  }
+
+  .chart {
+    height: clamp(300px, 50vh, 400px);
   }
 
   .combined-chart {
     flex-direction: column;
+    height: clamp(350px, 60vh, 500px);
   }
 
   .chart-half {
     width: 100%;
     height: 50%;
+    min-height: clamp(150px, 25vh, 200px);
   }
 }
 
+/* 小屏幕手机适配 */
+@media (max-width: 480px) {
+  .dashboard {
+    padding-bottom: 100px;
+  }
 
+  .dashboard-header {
+    padding: 15px 20px;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(1.125rem, 6vw, 1.5rem);
+    line-height: 1.2;
+  }
+
+  .time {
+    font-size: clamp(0.75rem, 4vw, 0.875rem);
+  }
+
+  .dashboard-content {
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .chart-container {
+    min-height: clamp(300px, 70vh, 400px);
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .chart-title {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    margin-bottom: 10px;
+  }
+
+  .chart {
+    height: clamp(250px, 60vh, 350px);
+  }
+
+  .combined-chart {
+    height: clamp(280px, 65vh, 380px);
+  }
+
+  .chart-half {
+    min-height: clamp(120px, 30vh, 160px);
+  }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 360px) {
+  .dashboard-header {
+    padding: 10px 15px;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(1rem, 7vw, 1.25rem);
+  }
+
+  .dashboard-content {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .chart-container {
+    min-height: clamp(250px, 75vh, 350px);
+    padding: 10px;
+  }
+
+  .chart {
+    height: clamp(200px, 65vh, 300px);
+  }
+
+  .combined-chart {
+    height: clamp(230px, 70vh, 330px);
+  }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1920px) {
+  .dashboard-content {
+    gap: clamp(30px, 2.5vw, 40px);
+    padding: clamp(30px, 2.5vw, 40px);
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  .chart-container {
+    min-height: clamp(500px, 55vh, 700px);
+    padding: clamp(25px, 2vw, 35px);
+  }
+
+  .chart {
+    height: clamp(450px, 50vh, 650px);
+  }
+
+  .combined-chart {
+    height: clamp(450px, 50vh, 650px);
+  }
+}
+
+/* 确保分页组件样式 */
 .el-pagination {
-  margin-top: 10px;
+  margin-top: 20px;
+  justify-content: center;
+  padding: 0 20px;
 }
 
 .detail-pagination {
@@ -1294,6 +1661,24 @@ function quantile(sortedArray, p) {
   color: #000 !important;
 }
 
+/* 确保对话框在移动端也能正常显示 */
+@media (max-width: 768px) {
+  .el-dialog {
+    width: 95% !important;
+    margin: 0 auto !important;
+  }
 
+  .el-dialog__body {
+    padding: 10px !important;
+  }
 
+  .el-table {
+    font-size: 12px !important;
+  }
+
+  .el-table th,
+  .el-table td {
+    padding: 8px 4px !important;
+  }
+}
 </style>

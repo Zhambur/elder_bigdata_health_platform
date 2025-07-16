@@ -201,10 +201,10 @@ export default {
 <style scoped>
 .chat-window {
   position: fixed;
-  bottom: 100px;
-  right: 30px;
-  width: 380px;
-  height: 500px;
+  bottom: clamp(80px, 8vh, 100px);
+  right: clamp(20px, 3vw, 30px);
+  width: clamp(320px, 25vw, 400px); /* 响应式宽度：320px-400px */
+  height: clamp(400px, 60vh, 600px); /* 响应式高度：400px-600px */
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-radius: 20px;
@@ -229,7 +229,7 @@ export default {
 }
 
 .chat-header {
-  padding: 20px;
+  padding: clamp(15px, 2vh, 20px);
   background: linear-gradient(135deg, #4ecdc4 0%, #00d4ff 100%);
   color: white;
   display: flex;
@@ -240,14 +240,14 @@ export default {
 
 .header-title {
   font-weight: 600;
-  font-size: 16px;
+  font-size: clamp(14px, 1.2vw, 16px); /* 响应式字体 */
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .ai-icon {
-  font-size: 20px;
+  font-size: clamp(18px, 1.5vw, 20px); /* 响应式图标大小 */
 }
 
 .close-btn {
@@ -266,11 +266,11 @@ export default {
 
 .chat-messages {
   flex: 1;
-  padding: 20px;
+  padding: clamp(15px, 2vh, 20px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: clamp(12px, 1.5vh, 15px);
 }
 
 .message {
@@ -287,7 +287,7 @@ export default {
 }
 
 .message-content {
-  padding: 12px 16px;
+  padding: clamp(10px, 1.2vh, 12px) clamp(12px, 1.5vw, 16px);
   border-radius: 18px;
   position: relative;
 }
@@ -309,7 +309,7 @@ export default {
 }
 
 .message-time {
-  font-size: 11px;
+  font-size: clamp(10px, 0.8vw, 11px); /* 响应式时间字体 */
   opacity: 0.7;
   margin-top: 5px;
 }
@@ -357,23 +357,23 @@ export default {
 }
 
 .chat-input {
-  padding: 20px;
+  padding: clamp(15px, 2vh, 20px);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .input-container {
   display: flex;
-  gap: 10px;
+  gap: clamp(8px, 1vw, 10px);
   align-items: center;
 }
 
 .message-input {
   flex: 1;
-  padding: 12px 16px;
+  padding: clamp(10px, 1.2vh, 12px) clamp(12px, 1.5vw, 16px);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 25px;
   outline: none;
-  font-size: 14px;
+  font-size: clamp(13px, 1.1vw, 14px); /* 响应式输入字体 */
   background: white;
   transition: border-color 0.2s;
 }
@@ -388,8 +388,8 @@ export default {
 }
 
 .send-btn {
-  width: 44px;
-  height: 44px;
+  width: clamp(40px, 4vw, 44px); /* 响应式按钮大小 */
+  height: clamp(40px, 4vw, 44px);
   border: none;
   border-radius: 50%;
   background: linear-gradient(135deg, #4ecdc4 0%, #00d4ff 100%);
@@ -411,14 +411,142 @@ export default {
   transform: none;
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 扩展更多断点 */
+@media (max-width: 1440px) {
+  .chat-window {
+    width: clamp(300px, 28vw, 380px);
+    height: clamp(450px, 55vh, 550px);
+  }
+}
+
+@media (max-width: 1200px) {
+  .chat-window {
+    width: clamp(280px, 35vw, 350px);
+    height: clamp(400px, 50vh, 500px);
+  }
+}
+
+@media (max-width: 992px) {
+  .chat-window {
+    width: clamp(280px, 45vw, 320px);
+    height: clamp(380px, 45vh, 450px);
+    bottom: clamp(60px, 6vh, 80px);
+    right: clamp(15px, 2vw, 25px);
+  }
+}
+
 @media (max-width: 768px) {
   .chat-window {
-    width: calc(100vw - 40px);
-    height: 400px;
-    bottom: 80px;
-    right: 20px;
-    left: 20px;
+    width: calc(100vw - clamp(30px, 5vw, 40px));
+    height: clamp(350px, 50vh, 400px);
+    bottom: clamp(60px, 8vh, 80px);
+    right: clamp(15px, 2.5vw, 20px);
+    left: clamp(15px, 2.5vw, 20px);
+  }
+
+  .header-title {
+    font-size: clamp(13px, 3vw, 15px);
+  }
+
+  .ai-icon {
+    font-size: clamp(16px, 4vw, 18px);
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-window {
+    width: calc(100vw - 20px);
+    height: clamp(300px, 60vh, 350px);
+    bottom: clamp(50px, 10vh, 70px);
+    right: 10px;
+    left: 10px;
+  }
+
+  .header-title {
+    font-size: 13px;
+  }
+
+  .ai-icon {
+    font-size: 16px;
+  }
+
+  .message-input {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .send-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 360px) {
+  .chat-window {
+    width: calc(100vw - 16px);
+    height: clamp(280px, 65vh, 320px);
+    bottom: clamp(40px, 8vh, 60px);
+    right: 8px;
+    left: 8px;
+  }
+
+  .header-title {
+    font-size: 12px;
+  }
+
+  .ai-icon {
+    font-size: 14px;
+  }
+
+  .message-input {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .send-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .chat-header {
+    padding: 12px;
+  }
+
+  .chat-messages {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .chat-input {
+    padding: 12px;
+  }
+}
+
+/* 超宽屏优化 */
+@media (min-width: 1920px) {
+  .chat-window {
+    width: clamp(400px, 22vw, 480px);
+    height: clamp(600px, 65vh, 700px);
+    bottom: clamp(100px, 8vh, 120px);
+    right: clamp(30px, 3vw, 50px);
+  }
+
+  .header-title {
+    font-size: clamp(16px, 1.2vw, 18px);
+  }
+
+  .ai-icon {
+    font-size: clamp(20px, 1.5vw, 24px);
+  }
+
+  .message-input {
+    font-size: clamp(14px, 1.1vw, 16px);
+  }
+
+  .send-btn {
+    width: clamp(44px, 4vw, 50px);
+    height: clamp(44px, 4vw, 50px);
   }
 }
 
