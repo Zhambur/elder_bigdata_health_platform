@@ -113,7 +113,7 @@
 
       <!-- 右下：慢病风险柱状图 -->
       <div class="chart-container">
-        <div class="chart-title">慢病风险分析</div>
+        <div class="chart-title">风险预警模型 </div>
         <VChart
           v-if="!isLoadingRiskPrediction && !errorStates.riskPrediction"
           :option="riskPredictionOption"
@@ -738,8 +738,7 @@ export default {
           },
           select: animationConfig.interaction.select,
           label: {
-            color: "#fff",
-            fontSize: getResponsiveFontSize(30),
+            show:false,
           },
           labelLine: {
             lineStyle: {
@@ -799,8 +798,7 @@ export default {
           },
           select: animationConfig.interaction.select,
           label: {
-            color: "#fff",
-            fontSize: getResponsiveFontSize(30),
+            show:false,
           },
           labelLine: {
             lineStyle: {
@@ -1096,7 +1094,7 @@ export default {
     const riskPredictionOption = ref({
       ...animationConfig.progressive,
       title: {
-        text: "健康风险预测",
+        text: "风险预测柱状图",
         textStyle: {
           color: "#fff",
           fontSize: getResponsiveFontSize(30),
@@ -1312,7 +1310,7 @@ export default {
       existingRiskBarOption.value = {
         ...animationConfig.progressive,
         title: {
-          text: "当前风险观测",
+          text: "风险观测柱状图",
           textStyle: {
             color: "#fff",
             fontSize: getResponsiveFontSize(30),
